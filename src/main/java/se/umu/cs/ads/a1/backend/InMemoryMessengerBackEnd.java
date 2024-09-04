@@ -278,7 +278,7 @@ public class InMemoryMessengerBackEnd implements Messenger
 
 
 	//----------------------------------------------------------
-  //----------------------------------------------------------
+    // ----------------------------------------------------------
 	private static class TopicBackEnd
 	{
 	  private final HashSet<MessageId> messages;
