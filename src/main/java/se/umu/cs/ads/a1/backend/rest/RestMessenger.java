@@ -1,15 +1,27 @@
 package se.umu.cs.ads.a1.backend.rest;
 
-import se.umu.cs.ads.a1.backend.InMemoryMessengerBackEnd;
+import org.restlet.resource.ClientResource;
 import se.umu.cs.ads.a1.interfaces.Messenger;
-import se.umu.cs.ads.a1.types.*;
+import se.umu.cs.ads.a1.types.Message;
+import se.umu.cs.ads.a1.types.MessageId;
+import se.umu.cs.ads.a1.types.Topic;
+import se.umu.cs.ads.a1.types.Username;
 
-import java.util.HashMap;
+public class RestMessenger implements Messenger {
 
-public class RestBackEnd implements Messenger {
+    RestletServer server;
+
+    public RestMessenger() {
+        server = new RestletServer();
+    }
+
+    public void stopServer() {
+        server.stop();
+    }
 
     @Override
     public void store(Message message) {
+        new ClientResource("http://localhost:8080/message").post(message);
     }
 
     @Override
@@ -19,6 +31,8 @@ public class RestBackEnd implements Messenger {
 
     @Override
     public Message retrieve(MessageId message) {
+        //TODO
+        //return new ClientResource("http://localhost:8080/message").setAttribute("").get();
         return null;
     }
 
