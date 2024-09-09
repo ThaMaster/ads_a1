@@ -8,21 +8,22 @@ import se.umu.cs.ads.a1.types.Topic;
 import se.umu.cs.ads.a1.types.Username;
 import se.umu.cs.ads.a1.util.Util;
 
-public class A1
+public class Main
 {
   //----------------------------------------------------------
   //----------------------------------------------------------
   private static Messenger loadMessenger (String fqn)
   {
-    try
-    {
+    try {
+
       Class<?> _class = Class.forName(fqn);
       return (Messenger)_class.getDeclaredConstructor().newInstance();
-    }
-    catch (Exception e)
-    {
+
+    } catch (Exception e) {
+
       e.printStackTrace();
       throw new IllegalStateException("unable to instantiate messenger class '" + fqn + "'");
+
     }
   }
 
@@ -31,11 +32,15 @@ public class A1
   //----------------------------------------------------------
   public static void main (String[] args)
   {
-    try
-    {
+    try {
       // defaults to example messenger implementation
       final String[] arguments = Util.filterFlags(args);
-      final String fqn = arguments.length > 0 ? arguments[0] : InMemoryMessengerBackEnd.class.getCanonicalName();
+      final String fqn;
+      if(arguments.length > 0) {
+        fqn = "se.umu.cs.ads.a1.backend." +  arguments[0];
+      } else {
+        fqn = InMemoryMessengerBackEnd.class.getCanonicalName();
+      }
 
       // dynamic class loading for messenger instantiation
       Messenger messenger = loadMessenger(fqn);
@@ -56,15 +61,12 @@ public class A1
       if (Util.containsFlag(args,"-logic"))
       {
         LogicTest test = new LogicTest(messenger);
-        Topic topic = new Topic("/test/logic");
-
-        System.out.println("testing store/delete logic...");
-        test.testStoreAndDelete(Util.constructRandomMessage(username,topic,1024));
+        System.out.println("Testing logic:");
+        test.runAllTests();
       }
 
       // example performance test
-      if (Util.containsFlag(args,"-perf"))
-      {
+      if (Util.containsFlag(args,"-perf")) {
         PerformanceTest test = new PerformanceTest(messenger);
 
         System.out.println("testing retrieval performance...");
@@ -72,10 +74,10 @@ public class A1
         test.testMessageRetrieval(username,100000,1024);
         test.testMessageRetrieval(username,10000000,1024);
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
     }
+
+    System.exit(0);
   }
 }

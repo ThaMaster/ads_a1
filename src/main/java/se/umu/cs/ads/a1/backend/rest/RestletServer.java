@@ -1,22 +1,42 @@
 package se.umu.cs.ads.a1.backend.rest;
 
+import org.restlet.Component;
 import org.restlet.Server;
 import org.restlet.data.Protocol;
 
+import java.sql.SQLOutput;
+
 public class RestletServer {
 
-    private static Server server;
+    private static Component component;
 
     public RestletServer() {
-        // Create the HTTP server and listen on port 8182
-        server = new Server(Protocol.HTTP, 8080);
-        server.setNext(new RestletApp());
+        // Create the HTTP server and listen on port 8080
+        System.out.println("Rest: Starting server!");
+        // Create a Restlet component
+        component = new Component();
+
+        // Create and configure the HTTP server on localhost
+        component.getServers().add(Protocol.HTTP, "localhost", 8080);
+
+        // Attach the application to the component under the "/api" path
+        component.getDefaultHost().attach("/messenger", new RestletApp());
+
+        // Start the server
         start();
+
+        // Output to confirm server is running
+        component.getServers().forEach(server -> {
+            System.out.println("Server is running at: " + server.getAddress() + ":" + server.getPort());
+        });
+
+        // Add shutdown hook to close the server when closing this thread.
+        Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
     }
 
     public void start() {
         try {
-            server.start();
+            component.start();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -24,7 +44,7 @@ public class RestletServer {
 
     public void stop() {
         try {
-            server.stop();
+            component.stop();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

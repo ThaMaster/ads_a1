@@ -70,7 +70,7 @@
                                     <Class-Path>./</Class-Path>
                                 </manifestEntries>
                                 <manifest>
-                                    <mainClass>se.umu.cs.ads.a1.A1</mainClass>
+                                    <mainClass>se.umu.cs.ads.a1.Main</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
