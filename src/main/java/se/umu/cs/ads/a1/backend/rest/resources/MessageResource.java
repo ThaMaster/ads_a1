@@ -4,17 +4,13 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.resource.*;
-import org.restlet.security.User;
 import se.umu.cs.ads.a1.backend.InMemoryMessengerBackEnd;
 import se.umu.cs.ads.a1.backend.JsonUtil;
 import se.umu.cs.ads.a1.backend.rest.RestBackend;
-import se.umu.cs.ads.a1.backend.rest.RestletApp;
 import se.umu.cs.ads.a1.types.Message;
 import se.umu.cs.ads.a1.types.MessageId;
-import se.umu.cs.ads.a1.types.Username;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 public class MessageResource extends ServerResource {
 
@@ -27,7 +23,7 @@ public class MessageResource extends ServerResource {
     }
 
     @Post
-    public void storeMessage(JacksonRepresentation<Message> msgEntity){
+    public void storeMessage(JacksonRepresentation<Message> msgEntity) {
         try {
             if (msgEntity.getMediaType().equals(MediaType.APPLICATION_JSON)) {
                 Message msg = JsonUtil.parseMessage(msgEntity.getText());
@@ -47,8 +43,9 @@ public class MessageResource extends ServerResource {
     @Get
     public JacksonRepresentation<Message> getMessageById() {
         // Get the message id to retrieve
-        String id = (String) getRequestAttributes().get("messageId");
-        if(id == null || id.isEmpty()) {
+        String qValue = getQueryValue("messageId");
+        String id = JsonUtil.getValueFromJson(qValue);
+        if (id == null || id.isEmpty()) {
             setStatus(Status.CLIENT_ERROR_BAD_REQUEST, "No message id provided!");
             return null;
         }
@@ -73,8 +70,9 @@ public class MessageResource extends ServerResource {
 
     @Delete
     public void handleDelete() {
-        String id = (String) getRequestAttributes().get("messageId");
-        if(id == null || id.isEmpty()) {
+        String qValue = getQueryValue("messageId");
+        String id = JsonUtil.getValueFromJson(qValue);
+        if (id == null || id.isEmpty()) {
             setStatus(Status.CLIENT_ERROR_BAD_REQUEST, "No message id provided!");
         }
         backend.delete(new MessageId(id));

@@ -9,7 +9,7 @@ public class RestBackend {
         RestBackend.backend = backend;
     }
 
-    public static InMemoryMessengerBackEnd getBackend()  {
+    public static InMemoryMessengerBackEnd getBackend() {
         return backend;
     }
 }

@@ -1,10 +1,7 @@
 package se.umu.cs.ads.a1.backend.rest;
 
 import org.restlet.Component;
-import org.restlet.Server;
 import org.restlet.data.Protocol;
-
-import java.sql.SQLOutput;
 
 public class RestletServer {
 

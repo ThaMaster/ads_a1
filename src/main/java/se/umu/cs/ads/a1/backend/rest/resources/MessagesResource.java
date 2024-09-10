@@ -1,19 +1,13 @@
 package se.umu.cs.ads.a1.backend.rest.resources;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.resource.*;
-import org.restlet.security.User;
 import se.umu.cs.ads.a1.backend.InMemoryMessengerBackEnd;
 import se.umu.cs.ads.a1.backend.JsonUtil;
 import se.umu.cs.ads.a1.backend.rest.RestBackend;
-import se.umu.cs.ads.a1.backend.rest.RestletApp;
 import se.umu.cs.ads.a1.types.Message;
-import se.umu.cs.ads.a1.types.MessageId;
-import se.umu.cs.ads.a1.types.Topic;
-import se.umu.cs.ads.a1.types.Username;
 
 import java.io.IOException;
 import java.util.List;
@@ -29,7 +23,7 @@ public class MessagesResource extends ServerResource {
     }
 
     @Post
-    public void batchStoreMessages(JacksonRepresentation<List<Message>> msgEntity){
+    public void batchStoreMessages(JacksonRepresentation<List<Message>> msgEntity) {
         try {
             if (msgEntity.getMediaType().equals(MediaType.APPLICATION_JSON)) {
                 Message[] msgList = JsonUtil.parseMessages(msgEntity.getText());
@@ -55,7 +49,6 @@ public class MessagesResource extends ServerResource {
         // TODO: Implement this function
         return null;
     }
-
 
 
     @Delete

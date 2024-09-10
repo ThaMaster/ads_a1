@@ -27,7 +27,7 @@ public class PerformanceTest
     Message[] messages = Message.construct(username,topic,content,data,nrMessages);
     messenger.store(messages);
 
-	  MessageId[] messageIds = messenger.listMessages(topic);
+    MessageId[] messageIds = messenger.listMessages(topic);
     if (messageIds.length != nrMessages)
       throw new IllegalStateException("testMessageRetrieval(): setup failure");
 

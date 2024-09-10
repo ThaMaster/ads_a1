@@ -17,13 +17,9 @@ public class RestletApp extends Application {
         Router router = new Router(getContext());
 
         router.attach("/message", MessageResource.class);
-        router.attach("/message/{messageId}", MessageResource.class);
-
         router.attach("/messages", MessagesResource.class);
-        router.attach("/messages/{ids}", MessagesResource.class);
-
-        router.attach("/messageIds/username/{username}", MessageIdsResource.class);
-        router.attach("/messageIds/topic/{topic}", MessageIdsResource.class);
+        router.attach("/messageIds/username", MessageIdsResource.class);
+        router.attach("/messageIds/topic", MessageIdsResource.class);
 
         return router;
     }

@@ -51,11 +51,13 @@ public class RestMessenger implements Messenger {
     @Override
     public Message retrieve(MessageId message) {
         try {
-            ClientResource client = new ClientResource("http://localhost:8080/messenger/message/" + message.getValue());
+            JacksonRepresentation<MessageId> idRep = new JacksonRepresentation<>(message);
+            ClientResource client = new ClientResource("http://localhost:8080/messenger/message");
+            client.addQueryParameter("messageId", idRep.getText());
 
             JacksonRepresentation<Message> msgRep = client.get(JacksonRepresentation.class);
 
-            if(msgRep == null || !client.getStatus().isSuccess()) {
+            if (msgRep == null || !client.getStatus().isSuccess()) {
                 return null;
             }
 
@@ -75,11 +77,18 @@ public class RestMessenger implements Messenger {
 
     @Override
     public void delete(MessageId message) {
-        ClientResource client = new ClientResource("http://localhost:8080/messenger/message/" + message.getValue());
-        client.delete();
+        try {
+            JacksonRepresentation<MessageId> idRep = new JacksonRepresentation<>(message);
+            ClientResource client = new ClientResource("http://localhost:8080/messenger/message");
+            client.addQueryParameter("messageId", idRep.getText());
+            client.delete();
 
-        if (!client.getStatus().isSuccess()) {
-            System.out.println("Rest: error while deleting message with id '" + message.getValue() + "'. Status: " + client.getStatus());
+            if (!client.getStatus().isSuccess()) {
+                System.out.println("Rest: error while deleting message with id '" + message.getValue() + "'. Status: " + client.getStatus());
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -127,10 +136,12 @@ public class RestMessenger implements Messenger {
     @Override
     public MessageId[] listMessages(Username username) {
         try {
-            ClientResource client = new ClientResource("http://localhost:8080/messenger/messageIds/username/" + username.getValue());
+            JacksonRepresentation<Username> usernameRep = new JacksonRepresentation<>(username);
+            ClientResource client = new ClientResource("http://localhost:8080/messenger/messageIds/username");
+            client.getReference().addQueryParameter("username", usernameRep.getText());
             JacksonRepresentation<Message[]> msgRep = client.get(JacksonRepresentation.class);
 
-            if(!client.getStatus().isSuccess()) {
+            if (!client.getStatus().isSuccess()) {
                 return null;
             }
 
@@ -146,12 +157,12 @@ public class RestMessenger implements Messenger {
     public MessageId[] listMessages(Topic topic) {
         try {
             JacksonRepresentation<Topic> topicRep = new JacksonRepresentation<>(topic);
-            // TODO: Maybe just use object mapper and write it as json object?
-            String uri = "http://localhost:8080/messenger/messageIds/topic/" + topicRep.getText();
-            ClientResource client = new ClientResource(uri);
+            ClientResource client = new ClientResource("http://localhost:8080/messenger/messageIds/topic");
+            client.getReference().addQueryParameter("topic", topicRep.getText());
+
             JacksonRepresentation<Message[]> msgRep = client.get(JacksonRepresentation.class);
 
-            if(!client.getStatus().isSuccess()) {
+            if (!client.getStatus().isSuccess()) {
                 return null;
             }
 

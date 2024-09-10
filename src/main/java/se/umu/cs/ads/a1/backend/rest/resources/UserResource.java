@@ -1,6 +1,5 @@
 package se.umu.cs.ads.a1.backend.rest.resources;
 
-import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
@@ -8,7 +7,6 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import se.umu.cs.ads.a1.backend.InMemoryMessengerBackEnd;
 import se.umu.cs.ads.a1.backend.rest.RestBackend;
-import se.umu.cs.ads.a1.backend.rest.RestletApp;
 
 public class UserResource extends ServerResource {
 

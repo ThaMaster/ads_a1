@@ -3,12 +3,7 @@ package se.umu.cs.ads.a1.backend;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.type.TypeReference;
 import se.umu.cs.ads.a1.types.*;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 public class JsonUtil {
 
@@ -26,6 +21,7 @@ public class JsonUtil {
     }
 
     private static Message getMessageFromNode(JsonNode rootNode) {
+        String messageId = rootNode.get("id").get("value").asText();
         long timestampValue = rootNode.get("timestamp").get("value").longValue();
         String usernameValue = rootNode.get("username").get("value").toString();
         String topicValue = rootNode.get("topic").get("value").toString();
@@ -33,7 +29,7 @@ public class JsonUtil {
         byte[] data = rootNode.get("data").get("value").toString().getBytes();
 
         return new Message(
-                getMessageIdFromNode(rootNode),
+                new MessageId(cleanupJsonValue(messageId)),
                 new Timestamp(timestampValue),
                 new Username(cleanupJsonValue(usernameValue)),
                 new Topic(cleanupJsonValue(topicValue)),
@@ -41,8 +37,16 @@ public class JsonUtil {
                 new Data(data));
     }
 
-    private static MessageId getMessageIdFromNode(JsonNode rootNode) {
-        return new MessageId(cleanupJsonValue(rootNode.get("id").get("value").asText()));
+    public static String getValueFromJson(String jsonString) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode rootNode = mapper.readTree(jsonString);
+            return cleanupJsonValue(rootNode.get("value").toString());
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static MessageId[] parseMessageIds(String jsonString) {
@@ -84,11 +88,11 @@ public class JsonUtil {
 
     private static String cleanupJsonValue(String input) {
         String jsonValue = input;
-        if(jsonValue == null) {
+        if (jsonValue == null) {
             return null;
         }
 
-        if(jsonValue.charAt(0) == '\"') {
+        if (jsonValue.charAt(0) == '\"') {
             jsonValue = jsonValue.replace("\"", "");
         }
 
