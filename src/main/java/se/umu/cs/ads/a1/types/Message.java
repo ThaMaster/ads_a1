@@ -99,7 +99,6 @@ public class Message
     return id.compareTo(rhs.id);
   }
 
-
   //----------------------------------------------------------
   //----------------------------------------------------------
   public static Message construct (Username username, Topic topic, Content content, Data data)

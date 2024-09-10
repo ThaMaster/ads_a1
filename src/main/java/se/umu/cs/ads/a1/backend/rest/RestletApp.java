@@ -4,9 +4,7 @@ import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.routing.Router;
 import se.umu.cs.ads.a1.backend.InMemoryMessengerBackEnd;
-import se.umu.cs.ads.a1.backend.rest.resources.MessageIdsResource;
-import se.umu.cs.ads.a1.backend.rest.resources.MessageResource;
-import se.umu.cs.ads.a1.backend.rest.resources.MessagesResource;
+import se.umu.cs.ads.a1.backend.rest.resources.*;
 
 public class RestletApp extends Application {
 
@@ -18,8 +16,14 @@ public class RestletApp extends Application {
 
         router.attach("/message", MessageResource.class);
         router.attach("/messages", MessagesResource.class);
+
         router.attach("/messageIds/username", MessageIdsResource.class);
         router.attach("/messageIds/topic", MessageIdsResource.class);
+
+        router.attach("/topics", TopicResource.class);
+        router.attach("/usernames", UsernameResource.class);
+
+        router.attach("/subscription", SubscriptionResource.class);
 
         return router;
     }

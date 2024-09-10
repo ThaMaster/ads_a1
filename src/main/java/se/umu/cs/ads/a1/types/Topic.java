@@ -26,8 +26,16 @@ public class Topic extends AbstractStringType
   }
 
   //----------------------------------------------------------
+  // matches a pattern to a topic
+  // NOTE: pattern may contain a wildcard '*'
+  public static boolean match (Topic pattern, Topic data)
+  {
+    return pattern.wildcard ? data.value.startsWith(pattern.value) : data.value.equals(pattern.value);
+  }
+
+  //----------------------------------------------------------
   public boolean match (Topic topic)
   {
-    return wildcard ? value.startsWith(topic.value) : value.equals(topic.value);
+    return match(this,topic);
   }
 }

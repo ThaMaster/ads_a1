@@ -5,12 +5,12 @@ import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.resource.*;
 import se.umu.cs.ads.a1.backend.InMemoryMessengerBackEnd;
-import se.umu.cs.ads.a1.backend.JsonUtil;
+import se.umu.cs.ads.a1.backend.rest.JsonUtil;
 import se.umu.cs.ads.a1.backend.rest.RestBackend;
 import se.umu.cs.ads.a1.types.Message;
+import se.umu.cs.ads.a1.types.MessageId;
 
 import java.io.IOException;
-import java.util.List;
 
 public class MessagesResource extends ServerResource {
 
@@ -23,12 +23,12 @@ public class MessagesResource extends ServerResource {
     }
 
     @Post
-    public void batchStoreMessages(JacksonRepresentation<List<Message>> msgEntity) {
+    public void batchStoreMessages(JacksonRepresentation<Message[]> msgEntity) {
         try {
             if (msgEntity.getMediaType().equals(MediaType.APPLICATION_JSON)) {
                 Message[] msgList = JsonUtil.parseMessages(msgEntity.getText());
                 backend.store(msgList);
-                setStatus(Status.SUCCESS_ACCEPTED);
+                setStatus(Status.SUCCESS_OK);
             } else {
                 setStatus(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE);
             }
@@ -39,21 +39,22 @@ public class MessagesResource extends ServerResource {
     }
 
     @Get
-    public JacksonRepresentation<String> handleGet() {
-        String ids = (String) getRequestAttributes().get("messageIds");
-        // TODO: Implement this function
-        return null;
-    }
+    public JacksonRepresentation<Message[]> handleGet() {
+        String qValue = getQueryValue("messageIds");
+        MessageId[] ids = JsonUtil.parseMessageIds(qValue);
 
-    private JacksonRepresentation<String> getMessagesByIds(String ids) {
-        // TODO: Implement this function
-        return null;
+        JacksonRepresentation<Message[]> messages = new JacksonRepresentation<>(backend.retrieve(ids));
+        messages.setMediaType(MediaType.APPLICATION_JSON);
+        setStatus(Status.SUCCESS_OK);
+        return messages;
     }
-
 
     @Delete
-    public void deleteMessagesByIds() {
-        String ids = (String) getRequestAttributes().get("messageIds");
-        // TODO: Implement this function
+    public void handleDelete() {
+        String qValue = getQueryValue("messageIds");
+        MessageId[] ids = JsonUtil.parseMessageIds(qValue);
+
+        backend.delete(ids);
+        setStatus(Status.SUCCESS_OK);
     }
 }

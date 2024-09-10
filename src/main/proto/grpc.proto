@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "proto";
+option java_outer_classname = "GrpcMessageProto";
+
+package grpc;
+
+message MessageId {
+  string value = 1;
+}
+
+message MessageIds {
+  repeated MessageId messageIds = 1;
+}
+
+message Timestamp {
+  int64 value = 1;
+}
+
+message Username {
+  string value = 1;
+}
+
+message Usernames {
+  repeated Username usernames = 1;
+}
+
+message Topic {
+  string value = 1;
+  bool wildcard = 2;
+}
+
+message Topics {
+  repeated Topic topics = 1;
+}
+
+message Content {
+  string value = 1;
+}
+
+message Data {
+  bytes data = 1;
+}
+
+message Message {
+  MessageId id = 1;
+  Timestamp timestamp = 2;
+  Username username = 3;
+  Topic topic = 4;
+  Content content = 5;
+  Data data = 6;
+}
+
+message Messages {
+  repeated Message messages = 1;
+}
+
+message StoreMessageResponse {
+  bool success = 1;
+}
+
+message StoreMessagesResponse {
+  bool success = 1;
+}
+
+service MessengerService {
+  rpc storeMessage (Message) returns (StoreMessageResponse);
+  rpc storeMessages (Messages) returns (StoreMessagesResponse);
+}

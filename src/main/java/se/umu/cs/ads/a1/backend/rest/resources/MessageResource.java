@@ -5,7 +5,7 @@ import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.resource.*;
 import se.umu.cs.ads.a1.backend.InMemoryMessengerBackEnd;
-import se.umu.cs.ads.a1.backend.JsonUtil;
+import se.umu.cs.ads.a1.backend.rest.JsonUtil;
 import se.umu.cs.ads.a1.backend.rest.RestBackend;
 import se.umu.cs.ads.a1.types.Message;
 import se.umu.cs.ads.a1.types.MessageId;

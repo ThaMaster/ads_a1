@@ -2,6 +2,7 @@ package se.umu.cs.ads.a1.backend.rest;
 
 import org.restlet.Component;
 import org.restlet.data.Protocol;
+import org.restlet.service.LogService;
 
 public class RestletServer {
 
@@ -18,6 +19,9 @@ public class RestletServer {
 
         // Attach the application to the component under the "/api" path
         component.getDefaultHost().attach("/messenger", new RestletApp());
+
+        // Disable server logging
+        component.setLogService(new LogService(false));
 
         // Start the server
         start();

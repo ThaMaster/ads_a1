@@ -8,6 +8,8 @@ import se.umu.cs.ads.a1.types.Topic;
 import se.umu.cs.ads.a1.types.Username;
 import se.umu.cs.ads.a1.util.Util;
 
+import java.util.ArrayList;
+
 public class Main
 {
   //----------------------------------------------------------
@@ -70,9 +72,11 @@ public class Main
         PerformanceTest test = new PerformanceTest(messenger);
 
         System.out.println("testing retrieval performance...");
-        test.testMessageRetrieval(username,1000,1024);
-        test.testMessageRetrieval(username,100000,1024);
-        test.testMessageRetrieval(username,10000000,1024);
+        System.out.println(test.testMessageRetrieval(username,10,1024));
+        System.out.println(test.testMessageRetrieval(username,1000,1024));
+        System.out.println(test.testMessageRetrieval(username,100000,1024));
+        System.out.println(test.testMessageRetrieval(username,250000,1024));
+
       }
     } catch (Exception e) {
       e.printStackTrace();

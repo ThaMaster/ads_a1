@@ -3,7 +3,7 @@ package se.umu.cs.ads.a1.adts;
 import java.util.Arrays;
 
 public class AbstractByteArrayType
-  implements Comparable<AbstractByteArrayType>
+        implements Comparable<AbstractByteArrayType>
 {
   private final byte[] value;
 

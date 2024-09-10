@@ -7,7 +7,7 @@ import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import se.umu.cs.ads.a1.backend.InMemoryMessengerBackEnd;
-import se.umu.cs.ads.a1.backend.JsonUtil;
+import se.umu.cs.ads.a1.backend.rest.JsonUtil;
 import se.umu.cs.ads.a1.backend.rest.RestBackend;
 import se.umu.cs.ads.a1.types.MessageId;
 import se.umu.cs.ads.a1.types.Topic;
@@ -43,6 +43,7 @@ public class MessageIdsResource extends ServerResource {
 
         JacksonRepresentation<MessageId[]> msgRep = new JacksonRepresentation<>(messages);
         msgRep.setMediaType(MediaType.APPLICATION_JSON);
+        setStatus(Status.SUCCESS_OK);
         return msgRep;
     }
 
@@ -52,6 +53,7 @@ public class MessageIdsResource extends ServerResource {
 
         JacksonRepresentation<MessageId[]> msgRep = new JacksonRepresentation<>(messages);
         msgRep.setMediaType(MediaType.APPLICATION_JSON);
+        setStatus(Status.SUCCESS_OK);
         return msgRep;
     }
 }
