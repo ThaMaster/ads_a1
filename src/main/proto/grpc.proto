@@ -1,4 +1,5 @@
 syntax = "proto3";
+import "google/protobuf/empty.proto";
 
 option java_multiple_files = true;
 option java_package = "proto";
@@ -56,15 +57,24 @@ message Messages {
   repeated Message messages = 1;
 }
 
-message StoreMessageResponse {
-  bool success = 1;
-}
-
-message StoreMessagesResponse {
-  bool success = 1;
+message Subscription {
+  Username username = 1;
+  Topic topic = 2;
 }
 
 service MessengerService {
-  rpc storeMessage (Message) returns (StoreMessageResponse);
-  rpc storeMessages (Messages) returns (StoreMessagesResponse);
+  rpc storeMessage (Message) returns (google.protobuf.Empty);
+  rpc storeMessages (Messages) returns (google.protobuf.Empty);
+  rpc retrieveMessage (MessageId) returns (Message);
+  rpc retrieveMessages (MessageIds) returns (Messages);
+  rpc deleteMessage (MessageId) returns (google.protobuf.Empty);
+  rpc deleteMessages (MessageIds) returns (google.protobuf.Empty);
+  rpc subscribe (Subscription) returns (Topics);
+  rpc unsubscribe (Subscription) returns (Topics);
+  rpc listUsers (google.protobuf.Empty) returns (Usernames);
+  rpc listTopics (google.protobuf.Empty) returns (Topics);
+  rpc listUserTopics (Username) returns (Topics);
+  rpc listSubscribers (Topic) returns (Usernames);
+  rpc listUserMessages (Username) returns (MessageIds);
+  rpc listTopicMessages (Topic) returns (MessageIds);
 }

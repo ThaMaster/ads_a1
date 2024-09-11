@@ -1,9 +1,11 @@
-package se.umu.cs.ads.a1.backend.rest;
+package se.umu.cs.ads.a1.backend;
 
 import org.restlet.data.MediaType;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
+import se.umu.cs.ads.a1.backend.rest.JsonUtil;
+import se.umu.cs.ads.a1.backend.rest.RestletServer;
 import se.umu.cs.ads.a1.interfaces.Messenger;
 import se.umu.cs.ads.a1.types.Message;
 import se.umu.cs.ads.a1.types.MessageId;
@@ -109,7 +111,7 @@ public class RestMessenger implements Messenger {
             ClientResource client = new ClientResource("http://localhost:8080/messenger/messages");
             client.addQueryParameter("messageIds", idsRep.getText());
             client.delete();
-            if(!client.getStatus().isSuccess()) {
+            if (!client.getStatus().isSuccess()) {
                 System.out.println("Could not delete");
             }
         } catch (IOException e) {

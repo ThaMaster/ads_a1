@@ -4,9 +4,6 @@ import se.umu.cs.ads.a1.interfaces.Messenger;
 import se.umu.cs.ads.a1.types.*;
 import se.umu.cs.ads.a1.util.Util;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-
 public class PerformanceTest {
     private final Messenger messenger;
 

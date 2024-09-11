@@ -72,11 +72,11 @@ public class Main
         PerformanceTest test = new PerformanceTest(messenger);
 
         System.out.println("testing retrieval performance...");
-        System.out.println(test.testMessageRetrieval(username,10,1024));
-        System.out.println(test.testMessageRetrieval(username,1000,1024));
-        System.out.println(test.testMessageRetrieval(username,100000,1024));
-        System.out.println(test.testMessageRetrieval(username,250000,1024));
-
+        System.out.println(test.testMessageRetrieval(username,10,128));
+        System.out.println(test.testMessageRetrieval(username,100,128));
+        System.out.println(test.testMessageRetrieval(username,1000,128));
+        System.out.println(test.testMessageRetrieval(username,10000,128));
+        System.out.println(test.testMessageRetrieval(username,100000,128));
       }
     } catch (Exception e) {
       e.printStackTrace();

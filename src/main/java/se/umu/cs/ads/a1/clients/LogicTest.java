@@ -33,6 +33,7 @@ public class LogicTest {
         testResults.add(testListSubscribers());
         testResults.add(testListTopicsByUsername());
         testResults.add(testWildcardTopic());
+        System.out.println("\nTest Results:");
 
         for (int i = 0; i < testResults.size(); i++) {
             System.out.println("[" + i + "] " + testResults.get(i));
@@ -115,7 +116,7 @@ public class LogicTest {
         }
 
         // Store some messages
-        for(Message m : messages)
+        for (Message m : messages)
             messenger.store(m);
 
         int nrMessagesAfterStore = messenger.listMessages(messages.get(0).getUsername()).length;
@@ -153,7 +154,7 @@ public class LogicTest {
         }
 
         // Store some messages
-        for(Message m : messages)
+        for (Message m : messages)
             messenger.store(m);
 
         int nrMessagesAfterStore = messenger.listMessages(messages.get(0).getTopic()).length;
@@ -214,10 +215,10 @@ public class LogicTest {
 
         messenger.store(messages);
 
-        MessageId[] ids = { messages[0].getId(), messages[1].getId(), messages[2].getId()};
+        MessageId[] ids = {messages[0].getId(), messages[1].getId(), messages[2].getId()};
         Message[] retrievedMessages = messenger.retrieve(ids);
 
-        if(retrievedMessages.length != 3) {
+        if (retrievedMessages.length != 3) {
             return testFailed("Incorrect number of messages", String.valueOf(retrievedMessages.length), "3");
         }
 
@@ -247,7 +248,7 @@ public class LogicTest {
             return testFailed("Incorrect number of messages", String.valueOf(nrMessagesAfterStore), "4");
         }
 
-        MessageId[] ids = { messages[0].getId(), messages[1].getId(), messages[2].getId(), messages[3].getId()};
+        MessageId[] ids = {messages[0].getId(), messages[1].getId(), messages[2].getId(), messages[3].getId()};
         messenger.delete(ids);
 
         int nrMessagesAfterDelete = messenger.listMessages(username).length;
@@ -280,11 +281,11 @@ public class LogicTest {
 
         int nrTopicsAfter = messenger.listTopics().length;
 
-        if(nrTopicsAfter != (nrTopicsBefore + 3)) {
+        if (nrTopicsAfter != (nrTopicsBefore + 3)) {
             return testFailed("Incorrect number of topics", String.valueOf(nrTopicsAfter), String.valueOf(nrTopicsBefore + 3));
         }
 
-        MessageId[] ids = { messages[0].getId(), messages[1].getId(), messages[2].getId(), messages[3].getId()};
+        MessageId[] ids = {messages[0].getId(), messages[1].getId(), messages[2].getId(), messages[3].getId()};
         messenger.delete(ids);
 
         return testSuccess();
@@ -309,11 +310,11 @@ public class LogicTest {
 
         Username[] retrievedUsernames = messenger.listUsers();
 
-        if(retrievedUsernames.length != 3) {
+        if (retrievedUsernames.length != 3) {
             return testFailed("Incorrect number of usernames", String.valueOf(retrievedUsernames.length), "3");
         }
 
-        MessageId[] ids = { messages[0].getId(), messages[1].getId(), messages[2].getId(), messages[3].getId()};
+        MessageId[] ids = {messages[0].getId(), messages[1].getId(), messages[2].getId(), messages[3].getId()};
         messenger.delete(ids);
 
         return testSuccess();
@@ -337,15 +338,15 @@ public class LogicTest {
 
         Topic[] subTopics1 = messenger.subscribe(username0, topic0);
 
-        if(subTopics1.length != 1) {
+        if (subTopics1.length != 1) {
             return testFailed("Incorrect amount of subscribed topics", String.valueOf(subTopics1.length), "1");
-        } else if(!subTopics1[0].getValue().equals(topic0.getValue())) {
+        } else if (!subTopics1[0].getValue().equals(topic0.getValue())) {
             return testFailed("Incorrect topic", subTopics1[0].getValue(), topic0.getValue());
         }
 
         Topic[] subTopics2 = messenger.subscribe(username0, topic1);
 
-        if(subTopics2.length != 1) {
+        if (subTopics2.length != 1) {
             return testFailed("Incorrect amount of subscribed topics", String.valueOf(subTopics2.length), "1");
         } else if (!subTopics2[0].getValue().equals(topic1.getValue())) {
             return testFailed("Incorrect topic", subTopics2[0].getValue(), topic1.getValue());
@@ -353,9 +354,9 @@ public class LogicTest {
 
         Topic[] subTopicsAfterDelete = messenger.unsubscribe(username0, topic0);
 
-        if(subTopicsAfterDelete.length != 1) {
+        if (subTopicsAfterDelete.length != 1) {
             return testFailed("Incorrect amount of subscribed topics", String.valueOf(subTopicsAfterDelete.length), "1");
-        } else if(!subTopicsAfterDelete[0].getValue().equals(topic0.getValue())) {
+        } else if (!subTopicsAfterDelete[0].getValue().equals(topic0.getValue())) {
             return testFailed("Incorrect topic", subTopicsAfterDelete[0].getValue(), topic0.getValue());
         }
 
@@ -385,21 +386,21 @@ public class LogicTest {
 
         messenger.subscribe(username1, topic0);
         Username[] subs = messenger.listSubscribers(topic0);
-        if(subs.length != 1) {
+        if (subs.length != 1) {
             return testFailed("Incorrect number of subscribers", String.valueOf(subs.length), "1");
         }
 
         messenger.subscribe(username2, topic0);
 
         subs = messenger.listSubscribers(topic0);
-        if(subs.length != 2) {
+        if (subs.length != 2) {
             return testFailed("Incorrect number of subscribers", String.valueOf(subs.length), "2");
         }
 
         messenger.unsubscribe(username2, topic0);
         subs = messenger.listSubscribers(topic0);
 
-        if(subs.length != 1) {
+        if (subs.length != 1) {
             return testFailed("Incorrect number of subscribers", String.valueOf(subs.length), "1");
         }
 
@@ -426,23 +427,23 @@ public class LogicTest {
 
         messenger.subscribe(username1, topic0);
         Topic[] topics = messenger.listTopics(username1);
-        if(topics.length != 1) {
+        if (topics.length != 1) {
             return testFailed("Incorrect number of topics", String.valueOf(topics.length), "1");
-        } else if(!topics[0].getValue().equals(topic0.getValue())) {
+        } else if (!topics[0].getValue().equals(topic0.getValue())) {
             return testFailed("Incorrect topic", topics[0].getValue(), topic0.getValue());
         }
 
         messenger.subscribe(username1, topic1);
 
         topics = messenger.listTopics(username1);
-        if(topics.length != 2) {
+        if (topics.length != 2) {
             return testFailed("Incorrect number of topics", String.valueOf(topics.length), "2");
         }
 
         messenger.unsubscribe(username1, topic0);
         topics = messenger.listTopics(username1);
 
-        if(topics.length != 1) {
+        if (topics.length != 1) {
             return testFailed("Incorrect number of topics", String.valueOf(topics.length), "1");
         }
 
@@ -468,7 +469,7 @@ public class LogicTest {
 
         Topic[] topics = messenger.subscribe(username1, topic0);
 
-        if(topics.length != 3) {
+        if (topics.length != 3) {
             return testFailed("Incorrect number of topics", String.valueOf(topics.length), "3");
         }
 
@@ -478,7 +479,7 @@ public class LogicTest {
     //----------------------------------------------------------
     private void printTestStart() {
         StackTraceElement element = Thread.currentThread().getStackTrace()[2];
-        System.out.println("[" + currentTest + "]\t " + element.getMethodName() + "...");
+        System.out.println("[" + currentTest + "]\t" + element.getMethodName() + "...");
         currentTest++;
     }
 

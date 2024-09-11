@@ -26,11 +26,6 @@ public class RestletServer {
         // Start the server
         start();
 
-        // Output to confirm server is running
-        component.getServers().forEach(server -> {
-            System.out.println("Server is running at: " + server.getAddress() + ":" + server.getPort());
-        });
-
         // Add shutdown hook to close the server when closing this thread.
         Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
     }
