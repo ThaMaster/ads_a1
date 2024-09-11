@@ -15,36 +15,47 @@ import se.umu.cs.ads.a1.types.Topic;
 import se.umu.cs.ads.a1.types.Username;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 
+/**
+ * The gRPC version of the Messenger interface. It handles
+ * all the communication with Remote Procedure Calls, more
+ * specifically the framework created by Google in 2016.
+ */
 public class GrpcMessenger implements Messenger {
 
     private ManagedChannel channel = null;
     private MessengerServiceGrpc.MessengerServiceBlockingStub stub;
 
+    /**
+     * Constructor of the GrpcMessenger, starts the server
+     * locally on a different thread, creates a channel for
+     * communication and creates a stub to communicate with.
+     */
     public GrpcMessenger() {
         startServerOnThread();
 
         // Initialize the channel and stub
-        channel = ManagedChannelBuilder.forAddress("localhost", 8080)
+        channel = ManagedChannelBuilder.forAddress("127.0.0.1", 8080)
                 .usePlaintext()
                 .maxInboundMessageSize(25 * 1024 * 1024) // 10 MB
                 .build();
         stub = MessengerServiceGrpc.newBlockingStub(channel);
     }
 
+    /**
+     * Starts the server on a separate thread, enabling
+     * communication with this class.
+     */
     private void startServerOnThread() {
-        new Thread(() -> {
-            try {
-                GrpcServer server = new GrpcServer();
-                server.start();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
+        try {
+            new Thread(() -> new GrpcServer().start()).start();
+        } catch (Exception e) {
+            System.out.println("BRUH");
+        }
     }
 
+    @Override
     public void store(Message message) {
         stub.storeMessage(GrpcUtil.javaToProto(message));
     }
@@ -126,7 +137,7 @@ public class GrpcMessenger implements Messenger {
 
     @Override
     public MessageId[] listMessages(Topic topic) {
-        proto.MessageIds response = stub.listTopicMessages(GrpcUtil.javaToProto(topic));
-        return GrpcUtil.protoToJava(response);
+            proto.MessageIds response = stub.listTopicMessages(GrpcUtil.javaToProto(topic));
+            return GrpcUtil.protoToJava(response);
     }
 }

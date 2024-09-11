@@ -20,6 +20,10 @@ public class GrpcServer {
     private InMemoryMessengerBackEnd backend;
     private Server server;
 
+    /**
+     * Constructor of the GrpcServer, will start a new backend and
+     * set up the necessary parameters in the server.
+     */
     public GrpcServer() {
         this.backend = new InMemoryMessengerBackEnd();
         this.server = ServerBuilder.forPort(8080)
@@ -28,11 +32,22 @@ public class GrpcServer {
                 .build();
     }
 
-    public void start() throws IOException, InterruptedException {
-        server.start();
+    /**
+     * Function for starting the server, it also adds a hook to shut down the server
+     * before the main thread is finished.
+     */
+    public void start() {
         Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
+        try {
+            server.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * Function for shutting down the server.
+     */
     private void stop() {
         if (server != null) {
             server.shutdown();
@@ -76,15 +91,16 @@ public class GrpcServer {
         @Override
         public void retrieveMessages(MessageIds request, StreamObserver<Messages> responseObserver) {
             MessageId[] ids = GrpcUtil.protoToJava(request);
-            Message[] foundMessages = backend.retrieve(ids);
 
-            if (foundMessages == null) {
+            try {
+                Message[] foundMessages = backend.retrieve(ids);
+
+                responseObserver.onNext(GrpcUtil.javaToProto(foundMessages));
+                responseObserver.onCompleted();
+
+            } catch (IllegalArgumentException e) {
                 responseObserver.onError(Status.NOT_FOUND.asRuntimeException());
-                return;
             }
-
-            responseObserver.onNext(GrpcUtil.javaToProto(foundMessages));
-            responseObserver.onCompleted();
         }
 
         @Override

@@ -5,16 +5,39 @@ import org.apache.commons.lang3.tuple.Pair;
 import proto.Topics;
 import se.umu.cs.ads.a1.types.*;
 
+/**
+ * Utility class for parsing data between the generated
+ * proto data types and the java data types. Will be
+ * used at the endpoints to send and retrieve data.
+ */
 public class GrpcUtil {
 
+    /**
+     * Converts the java MessageId class to the proto version.
+     *
+     * @param javaId the java class of MessageId
+     * @return the proto version of the MessageId
+     */
     public static proto.MessageId javaToProto(MessageId javaId) {
         return proto.MessageId.newBuilder().setValue(javaId.getValue()).build();
     }
 
+    /**
+     * Converts the proto MessageId type to the java class.
+     *
+     * @param protoId the proto version of MessageId
+     * @return the java version of MessageId
+     */
     public static MessageId protoToJava(proto.MessageId protoId) {
         return new MessageId(protoId.getValue());
     }
 
+    /**
+     * Converts an array of the java MessageId class to the proto version.
+     *
+     * @param javaIds the array of the java class of MessageId
+     * @return the proto version of the array
+     */
     public static proto.MessageIds javaToProto(MessageId[] javaIds) {
         proto.MessageIds.Builder builder = proto.MessageIds.newBuilder();
         for (MessageId javaTopic : javaIds) {
@@ -23,6 +46,12 @@ public class GrpcUtil {
         return builder.build();
     }
 
+    /**
+     * Converts an array of the proto version of MessageId to the java class.
+     *
+     * @param protoIds the array of the proto version of MessageID
+     * @return the java class version of the array
+     */
     public static MessageId[] protoToJava(proto.MessageIds protoIds) {
         MessageId[] ids = new MessageId[protoIds.getMessageIdsCount()];
         for (int i = 0; i < ids.length; i++) {
@@ -31,22 +60,52 @@ public class GrpcUtil {
         return ids;
     }
 
+    /**
+     * Converts the java class of Timestamp to the proto version.
+     *
+     * @param javaTimestamp the java class of Timestamp
+     * @return the proto version of Timestamp
+     */
     public static proto.Timestamp javaToProto(Timestamp javaTimestamp) {
         return proto.Timestamp.newBuilder().setValue(javaTimestamp.getValue()).build();
     }
 
+    /**
+     * Converts the proto version of Timestamp to the java class.
+     *
+     * @param protoTimestamp the proto version of Timestamp
+     * @return the java class of Timestamp
+     */
     public static Timestamp protoToJava(proto.Timestamp protoTimestamp) {
         return new Timestamp(protoTimestamp.getValue());
     }
 
+    /**
+     * Converts the java class of Username to the proto version.
+     *
+     * @param javaUsername the java class of Username
+     * @return the proto version of Username
+     */
     public static proto.Username javaToProto(Username javaUsername) {
         return proto.Username.newBuilder().setValue(javaUsername.getValue()).build();
     }
 
+    /**
+     * Converts the proto version of Username to the java class.
+     *
+     * @param protoUsername the proto version of Username
+     * @return the java class of Username
+     */
     public static Username protoToJava(proto.Username protoUsername) {
         return new Username(protoUsername.getValue());
     }
 
+    /**
+     * Converts an array of the java Username class to the proto version.
+     *
+     * @param javaUsernames the array of the java class of Username
+     * @return the converted proto version of the array
+     */
     public static proto.Usernames javaToProto(Username[] javaUsernames) {
         proto.Usernames.Builder builder = proto.Usernames.newBuilder();
         for (Username username : javaUsernames) {
@@ -55,6 +114,12 @@ public class GrpcUtil {
         return builder.build();
     }
 
+    /**
+     * Converts an array of the proto version of Username to the java class.
+     *
+     * @param protoUsernames the array of the proto version of Username
+     * @return the java class version of the array
+     */
     public static Username[] protoToJava(proto.Usernames protoUsernames) {
         Username[] usernames = new Username[protoUsernames.getUsernamesCount()];
         for (int i = 0; i < usernames.length; i++) {

@@ -91,7 +91,6 @@
             <version>${grpc.version}</version>
         </dependency>
     </dependencies>
-
     <build>
         <extensions>
             <extension>
