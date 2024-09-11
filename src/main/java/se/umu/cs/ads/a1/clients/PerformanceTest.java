@@ -26,13 +26,13 @@ public class PerformanceTest {
         if (messageIds.length != nrMessages)
             throw new IllegalStateException("testMessageRetrieval(): setup failure");
 
-        /*long t1 = System.currentTimeMillis();
+        long t1 = System.currentTimeMillis();
         for (MessageId message : messageIds)
             messenger.retrieve(message);
 
         long t2 = System.currentTimeMillis();
 
-        testResults += "\t" + (t2 - t1) + " ms (sequential)\n";*/
+        testResults += "\t" + (t2 - t1) + " ms (sequential)\n";
 
         long t3 = System.currentTimeMillis();
         messenger.retrieve(messageIds);

@@ -25,6 +25,7 @@ public class LogicTest {
         testResults.add(testCheckWithListing());
         testResults.add(testListByUsername());
         testResults.add(testListByTopic());
+        testResults.add(testBatchStore());
         testResults.add(testBatchRetrieve());
         testResults.add(testBatchDelete());
         testResults.add(testListTopics());
@@ -109,7 +110,7 @@ public class LogicTest {
         messages.add(Util.constructRandomMessage(username2, topic0, 1024));
         messages.add(Util.constructRandomMessage(username0, topic1, 1024));
 
-        int nrMessagesBeforeStore = messenger.listMessages(messages.get(0).getUsername()).length;
+        int nrMessagesBeforeStore = messenger.listMessages(username0).length;
 
         if (nrMessagesBeforeStore != 0) {
             return testFailed("Incorrect number of messages", String.valueOf(nrMessagesBeforeStore), "0");
@@ -119,7 +120,7 @@ public class LogicTest {
         for (Message m : messages)
             messenger.store(m);
 
-        int nrMessagesAfterStore = messenger.listMessages(messages.get(0).getUsername()).length;
+        int nrMessagesAfterStore = messenger.listMessages(username0).length;
 
         if (nrMessagesAfterStore != 2) {
             return testFailed("Incorrect number of messages", String.valueOf(nrMessagesAfterStore), "2");
@@ -147,7 +148,7 @@ public class LogicTest {
         messages.add(Util.constructRandomMessage(username2, topic0, 1024));
         messages.add(Util.constructRandomMessage(username0, topic1, 1024));
 
-        int nrMessagesBeforeStore = messenger.listMessages(messages.get(0).getTopic()).length;
+        int nrMessagesBeforeStore = messenger.listMessages(topic0).length;
 
         if (nrMessagesBeforeStore != 0) {
             return testFailed("Incorrect number of messages", String.valueOf(nrMessagesBeforeStore), "0");
@@ -157,7 +158,7 @@ public class LogicTest {
         for (Message m : messages)
             messenger.store(m);
 
-        int nrMessagesAfterStore = messenger.listMessages(messages.get(0).getTopic()).length;
+        int nrMessagesAfterStore = messenger.listMessages(topic0).length;
 
         if (nrMessagesAfterStore != 2) {
             return testFailed("Incorrect number of messages", String.valueOf(nrMessagesAfterStore), "2");
