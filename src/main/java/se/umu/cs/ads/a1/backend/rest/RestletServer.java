@@ -10,7 +10,6 @@ public class RestletServer {
 
     public RestletServer() {
         // Create the HTTP server and listen on port 8080
-        System.out.println("Rest: Starting server!");
         // Create a Restlet component
         component = new Component();
 

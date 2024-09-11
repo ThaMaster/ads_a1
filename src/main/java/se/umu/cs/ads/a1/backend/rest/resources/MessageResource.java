@@ -26,9 +26,8 @@ public class MessageResource extends ServerResource {
     public void storeMessage(JacksonRepresentation<Message> msgEntity) {
         try {
             if (msgEntity.getMediaType().equals(MediaType.APPLICATION_JSON)) {
-                Message msg = JsonUtil.parseMessage(msgEntity.getText());
 
-                backend.store(msg);
+                backend.store(JsonUtil.parseMessage(msgEntity.getText()));
 
                 setStatus(Status.SUCCESS_ACCEPTED);
             } else {
@@ -41,37 +40,22 @@ public class MessageResource extends ServerResource {
     }
 
     @Get
-    public JacksonRepresentation<Message> getMessageById() {
-        // Get the message id to retrieve
-        String qValue = getQueryValue("messageId");
-        String id = JsonUtil.getValueFromJson(qValue);
-        if (id == null || id.isEmpty()) {
-            setStatus(Status.CLIENT_ERROR_BAD_REQUEST, "No message id provided!");
-            return null;
-        }
-
-        Message msg;
-
+    public String getMessageById() {
+        String id = getQueryValue("messageId");
         try {
             // Fetch
-            msg = backend.retrieve(new MessageId(id));
+            Message msg = backend.retrieve(new MessageId(id));
+            // Send
+            setStatus(Status.SUCCESS_OK);
+            return JsonUtil.getJsonObject(msg);
         } catch (IllegalArgumentException e) {
             return null;
         }
-
-        // Serialize
-        JacksonRepresentation<Message> msgRep = new JacksonRepresentation<>(msg);
-        msgRep.setMediaType(MediaType.APPLICATION_JSON);
-
-        // Send
-        setStatus(Status.SUCCESS_OK);
-        return msgRep;
     }
 
     @Delete
     public void handleDelete() {
-        String qValue = getQueryValue("messageId");
-        String id = JsonUtil.getValueFromJson(qValue);
+        String id = getQueryValue("messageId");
         if (id == null || id.isEmpty()) {
             setStatus(Status.CLIENT_ERROR_BAD_REQUEST, "No message id provided!");
         }

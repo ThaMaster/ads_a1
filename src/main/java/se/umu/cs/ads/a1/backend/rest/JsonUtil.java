@@ -7,9 +7,10 @@ import se.umu.cs.ads.a1.types.*;
 
 public class JsonUtil {
 
+    private static ObjectMapper mapper = new ObjectMapper();
+
     public static Message parseMessage(String jsonString) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
             JsonNode rootNode = mapper.readTree(jsonString);
 
             return getMessageFromNode(rootNode);
@@ -39,7 +40,6 @@ public class JsonUtil {
 
     public static String getValueFromJson(String jsonString) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
             JsonNode rootNode = mapper.readTree(jsonString);
             return cleanupJsonValue(rootNode.get("value").toString());
         } catch (JsonProcessingException e) {
@@ -50,7 +50,6 @@ public class JsonUtil {
 
     public static MessageId[] parseMessageIds(String jsonString) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
             JsonNode arrayNode = mapper.readTree(jsonString);
             // Check if the json object is of array type
             if (arrayNode.isArray()) {
@@ -71,7 +70,6 @@ public class JsonUtil {
 
     public static Message[] parseMessages(String jsonString) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
             JsonNode arrayNode = mapper.readTree(jsonString);
             // Check if the json object is of array type
             if (arrayNode.isArray()) {
@@ -92,7 +90,6 @@ public class JsonUtil {
 
     public static Username[] parseUsernames(String jsonString) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
             JsonNode arrayNode = mapper.readTree(jsonString);
             // Check if the json object is of array type
             if (arrayNode.isArray()) {
@@ -113,7 +110,6 @@ public class JsonUtil {
 
     public static Topic[] parseTopics(String jsonString) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
             JsonNode arrayNode = mapper.readTree(jsonString);
             // Check if the json object is of array type
             if (arrayNode.isArray()) {
@@ -142,7 +138,6 @@ public class JsonUtil {
 
     public  static Topic parseTopic(String jsonString) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
             JsonNode rootNode = mapper.readTree(jsonString);
             return getTopicFromNode(rootNode);
         } catch (JsonProcessingException e) {
@@ -166,11 +161,18 @@ public class JsonUtil {
 
     public static void printJson(String jsonString) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
             JsonNode rootNode = mapper.readTree(jsonString);
             System.out.println(rootNode.toPrettyString());
         } catch (JsonProcessingException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static String getJsonObject(Object o) {
+        try {
+            return mapper.writeValueAsString(o);
+        } catch (JsonProcessingException e) {
+            return null;
         }
     }
 }

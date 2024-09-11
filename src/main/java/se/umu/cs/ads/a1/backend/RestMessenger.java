@@ -20,25 +20,23 @@ public class RestMessenger implements Messenger {
 
     private final ClientResource messageResource;
     private final ClientResource messagesResource;
-    private final ClientResource messageIdTopicResource;
-    private final ClientResource messageIdUsernameResource;
-    private final ClientResource topicResource;
-    private final ClientResource usernameResource;
     private final ClientResource subscriptionResource;
+    private final ClientResource usernamesResource;
+    private final ClientResource topicsResource;
+    private final ClientResource messageIdsUsernameResource;
+    private final ClientResource messageIdsTopicResource;
 
     public RestMessenger() {
 
-        // Start the restlet server
         new RestletServer();
 
-        // Initialize all the client resources
         messageResource = new ClientResource("http://localhost:8080/messenger/message");
         messagesResource = new ClientResource("http://localhost:8080/messenger/messages");
-        messageIdTopicResource = new ClientResource("http://localhost:8080/messenger/messageIds/topic");
-        messageIdUsernameResource = new ClientResource("http://localhost:8080/messenger/messageIds/username");
-        topicResource = new ClientResource("http://localhost:8080/messenger/topics");
-        usernameResource = new ClientResource("http://localhost:8080/messenger/usernames");
         subscriptionResource = new ClientResource("http://localhost:8080/messenger/subscription");
+        usernamesResource = new ClientResource("http://localhost:8080/messenger/usernames");
+        topicsResource = new ClientResource("http://localhost:8080/messenger/topics");
+        messageIdsUsernameResource = new ClientResource("http://localhost:8080/messenger/messageIds/username");
+        messageIdsTopicResource = new ClientResource("http://localhost:8080/messenger/messageIds/topic");
 
         // Turn of client and engine logging
         Logger.getLogger("org.restlet").setLevel(Level.OFF);
@@ -47,7 +45,7 @@ public class RestMessenger implements Messenger {
 
     @Override
     public void store(Message message) {
-        messageResource.getQuery().clear();
+        messageResource.getReference().setQuery(null);
         // Parse the message to the jackson representation
         JacksonRepresentation<Message> msgRep = new JacksonRepresentation<>(message);
         msgRep.setMediaType(MediaType.APPLICATION_JSON);
@@ -58,7 +56,7 @@ public class RestMessenger implements Messenger {
 
     @Override
     public void store(Message[] messages) {
-        messagesResource.getQuery().clear();
+        messagesResource.getReference().setQuery(null);
         // Parse the message to the jackson representation
         JacksonRepresentation<Message[]> msgRep = new JacksonRepresentation<>(messages);
         msgRep.setMediaType(MediaType.APPLICATION_JSON);
@@ -69,31 +67,27 @@ public class RestMessenger implements Messenger {
 
     @Override
     public Message retrieve(MessageId message) {
-        messageResource.getQuery().clear();
-        try {
-            JacksonRepresentation<MessageId> idRep = new JacksonRepresentation<>(message);
-            messageResource.addQueryParameter("messageId", idRep.getText());
+        messageResource.getReference().setQuery(null);
+        messageResource.addQueryParameter("messageId", message.getValue());
 
-            JacksonRepresentation<Message> msgRep = messageResource.get(JacksonRepresentation.class);
+        // This takes a VEEERY long time..
+        String msgRep = messageResource.get(String.class);
 
-            if (msgRep == null || !messageResource.getStatus().isSuccess()) {
-                return null;
-            }
-
-            return JsonUtil.parseMessage(msgRep.getText());
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (msgRep == null || !messageResource.getStatus().isSuccess()) {
+            return null;
         }
-        return null;
+
+        Message msg = JsonUtil.parseMessage(msgRep);
+        return msg;
     }
 
     @Override
     public Message[] retrieve(MessageId[] message) {
-        messagesResource.getQuery().clear();
+        messagesResource.getReference().setQuery(null);
         try {
             JacksonRepresentation<MessageId[]> idsRep = new JacksonRepresentation<>(message);
             messagesResource.addQueryParameter("messageIds", idsRep.getText());
+
             JacksonRepresentation<Message[]> msgRep = messagesResource.get(JacksonRepresentation.class);
 
             return JsonUtil.parseMessages(msgRep.getText());
@@ -105,19 +99,14 @@ public class RestMessenger implements Messenger {
 
     @Override
     public void delete(MessageId message) {
-        messageResource.getQuery().clear();
-        try {
-            JacksonRepresentation<MessageId> idRep = new JacksonRepresentation<>(message);
-            messageResource.addQueryParameter("messageId", idRep.getText());
-            messageResource.delete();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        messageResource.getReference().setQuery(null);
+        messageResource.addQueryParameter("messageId", message.getValue());
+        messageResource.delete();
     }
 
     @Override
     public void delete(MessageId[] messages) {
-        messagesResource.getQuery().clear();
+        messagesResource.getReference().setQuery(null);
         try {
             JacksonRepresentation<MessageId[]> idsRep = new JacksonRepresentation<>(messages);
             messagesResource.addQueryParameter("messageIds", idsRep.getText());
@@ -129,7 +118,7 @@ public class RestMessenger implements Messenger {
 
     @Override
     public Topic[] subscribe(Username username, Topic topic) {
-        subscriptionResource.getQuery().clear();
+        subscriptionResource.getReference().setQuery(null);
         try {
             JacksonRepresentation<Username> nameRep = new JacksonRepresentation<>(username);
             JacksonRepresentation<Topic> topRep = new JacksonRepresentation<>(topic);
@@ -150,7 +139,7 @@ public class RestMessenger implements Messenger {
 
     @Override
     public Topic[] unsubscribe(Username username, Topic topic) {
-        subscriptionResource.getQuery().clear();
+        subscriptionResource.getReference().setQuery(null);
         try {
             JacksonRepresentation<Username> nameRep = new JacksonRepresentation<>(username);
             JacksonRepresentation<Topic> topRep = new JacksonRepresentation<>(topic);
@@ -171,9 +160,9 @@ public class RestMessenger implements Messenger {
 
     @Override
     public Username[] listUsers() {
-        usernameResource.getQuery().clear();
+        usernamesResource.getReference().setQuery(null);
         try {
-            JacksonRepresentation<Username[]> msgRep = usernameResource.get(JacksonRepresentation.class);
+            JacksonRepresentation<Username[]> msgRep = usernamesResource.get(JacksonRepresentation.class);
             return JsonUtil.parseUsernames(msgRep.getText());
 
         } catch (IOException e) {
@@ -184,9 +173,9 @@ public class RestMessenger implements Messenger {
 
     @Override
     public Topic[] listTopics() {
-        topicResource.getQuery().clear();
+        topicsResource.getReference().setQuery(null);
         try {
-            JacksonRepresentation<Topic[]> msgRep = topicResource.get(JacksonRepresentation.class);
+            JacksonRepresentation<Topic[]> msgRep = topicsResource.get(JacksonRepresentation.class);
             return JsonUtil.parseTopics(msgRep.getText());
 
         } catch (IOException e) {
@@ -197,12 +186,12 @@ public class RestMessenger implements Messenger {
 
     @Override
     public Topic[] listTopics(Username username) {
-        topicResource.getQuery().clear();
+        topicsResource.getReference().setQuery(null);
         try {
             JacksonRepresentation<Username> usernameRep = new JacksonRepresentation<>(username);
-            topicResource.addQueryParameter("username", usernameRep.getText());
+            topicsResource.addQueryParameter("username", usernameRep.getText());
 
-            JacksonRepresentation<Topic[]> msgRep = topicResource.get(JacksonRepresentation.class);
+            JacksonRepresentation<Topic[]> msgRep = topicsResource.get(JacksonRepresentation.class);
             return JsonUtil.parseTopics(msgRep.getText());
 
         } catch (IOException e) {
@@ -213,12 +202,12 @@ public class RestMessenger implements Messenger {
 
     @Override
     public Username[] listSubscribers(Topic topic) {
-        usernameResource.getQuery().clear();
+        usernamesResource.getReference().setQuery(null);
         try {
             JacksonRepresentation<Topic> topicRep = new JacksonRepresentation<>(topic);
-            usernameResource.addQueryParameter("topic", topicRep.getText());
+            usernamesResource.addQueryParameter("topic", topicRep.getText());
 
-            JacksonRepresentation<Username[]> msgRep = usernameResource.get(JacksonRepresentation.class);
+            JacksonRepresentation<Username[]> msgRep = usernamesResource.get(JacksonRepresentation.class);
             return JsonUtil.parseUsernames(msgRep.getText());
 
         } catch (IOException e) {
@@ -229,13 +218,13 @@ public class RestMessenger implements Messenger {
 
     @Override
     public MessageId[] listMessages(Username username) {
-        messageIdUsernameResource.getQuery().clear();
+        messageIdsUsernameResource.getReference().setQuery(null);
         try {
             JacksonRepresentation<Username> usernameRep = new JacksonRepresentation<>(username);
-            messageIdUsernameResource.addQueryParameter("username", usernameRep.getText());
-            JacksonRepresentation<Message[]> msgRep = messageIdUsernameResource.get(JacksonRepresentation.class);
+            messageIdsUsernameResource.getReference().addQueryParameter("username", usernameRep.getText());
+            JacksonRepresentation<Message[]> msgRep = messageIdsUsernameResource.get(JacksonRepresentation.class);
 
-            if (!messageIdUsernameResource.getStatus().isSuccess()) {
+            if (!messageIdsUsernameResource.getStatus().isSuccess()) {
                 return null;
             }
 
@@ -249,14 +238,14 @@ public class RestMessenger implements Messenger {
 
     @Override
     public MessageId[] listMessages(Topic topic) {
-        messageIdTopicResource.getQuery().clear();
+        messageIdsTopicResource.getReference().setQuery(null);
         try {
             JacksonRepresentation<Topic> topicRep = new JacksonRepresentation<>(topic);
-            messageIdTopicResource.getReference().addQueryParameter("topic", topicRep.getText());
+            messageIdsTopicResource.addQueryParameter("topic", topicRep.getText());
 
-            JacksonRepresentation<Message[]> msgRep = messageIdTopicResource.get(JacksonRepresentation.class);
+            JacksonRepresentation<Message[]> msgRep = messageIdsTopicResource.get(JacksonRepresentation.class);
 
-            if (!messageIdTopicResource.getStatus().isSuccess()) {
+            if (!messageIdsTopicResource.getStatus().isSuccess()) {
                 return null;
             }
 
