@@ -2,7 +2,8 @@ package se.umu.cs.ads.a1.backend.rest.resources;
 
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
-import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.*;
 import se.umu.cs.ads.a1.backend.InMemoryMessengerBackEnd;
 import se.umu.cs.ads.a1.backend.rest.JsonUtil;
@@ -22,8 +23,8 @@ public class MessagesResource extends ServerResource {
         backend = RestBackend.getBackend();
     }
 
-    @Post
-    public void batchStoreMessages(JacksonRepresentation<Message[]> msgEntity) {
+    @Post("json")
+    public void batchStoreMessages(Representation msgEntity) {
         try {
             if (msgEntity.getMediaType().equals(MediaType.APPLICATION_JSON)) {
                 Message[] msgList = JsonUtil.parseMessages(msgEntity.getText());
@@ -38,15 +39,19 @@ public class MessagesResource extends ServerResource {
         }
     }
 
-    @Get
-    public JacksonRepresentation<Message[]> handleGet() {
-        String qValue = getQueryValue("messageIds");
-        MessageId[] ids = JsonUtil.parseMessageIds(qValue);
+    @Get("json")
+    public Representation handleGet() {
+        try {
+            String qValue = getQueryValue("messageIds");
+            MessageId[] ids = JsonUtil.parseMessageIds(qValue);
 
-        JacksonRepresentation<Message[]> messages = new JacksonRepresentation<>(backend.retrieve(ids));
-        messages.setMediaType(MediaType.APPLICATION_JSON);
-        setStatus(Status.SUCCESS_OK);
-        return messages;
+            Message[] messages = backend.retrieve(ids);
+
+            setStatus(Status.SUCCESS_OK);
+            return new StringRepresentation(JsonUtil.toJson(messages));
+        } catch (IllegalArgumentException e) {
+            return new StringRepresentation("");
+        }
     }
 
     @Delete

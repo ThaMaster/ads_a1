@@ -168,7 +168,7 @@ public class JsonUtil {
         }
     }
 
-    public static String getJsonObject(Object o) {
+    public static String toJson(Object o) {
         try {
             return mapper.writeValueAsString(o);
         } catch (JsonProcessingException e) {

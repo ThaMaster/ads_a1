@@ -2,7 +2,8 @@ package se.umu.cs.ads.a1.backend.rest.resources;
 
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
-import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.*;
 import se.umu.cs.ads.a1.backend.InMemoryMessengerBackEnd;
 import se.umu.cs.ads.a1.backend.rest.JsonUtil;
@@ -22,8 +23,8 @@ public class MessageResource extends ServerResource {
         backend = RestBackend.getBackend();
     }
 
-    @Post
-    public void storeMessage(JacksonRepresentation<Message> msgEntity) {
+    @Post("json")
+    public void storeMessage(Representation msgEntity) {
         try {
             if (msgEntity.getMediaType().equals(MediaType.APPLICATION_JSON)) {
 
@@ -39,17 +40,18 @@ public class MessageResource extends ServerResource {
         }
     }
 
-    @Get
-    public String getMessageById() {
+    @Get("json")
+    public Representation getMessageById() {
         String id = getQueryValue("messageId");
         try {
             // Fetch
             Message msg = backend.retrieve(new MessageId(id));
+
             // Send
             setStatus(Status.SUCCESS_OK);
-            return JsonUtil.getJsonObject(msg);
+            return new StringRepresentation(JsonUtil.toJson(msg));
         } catch (IllegalArgumentException e) {
-            return null;
+            return new StringRepresentation("");
         }
     }
 

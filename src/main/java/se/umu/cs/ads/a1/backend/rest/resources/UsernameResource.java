@@ -1,7 +1,8 @@
 package se.umu.cs.ads.a1.backend.rest.resources;
 
 import org.restlet.data.MediaType;
-import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
@@ -20,27 +21,28 @@ public class UsernameResource extends ServerResource {
         backend = RestBackend.getBackend();
     }
 
-    @Get
-    public JacksonRepresentation<Username[]> handleGet() {
-        String topicsJson = getQueryValue("topic");
-        if(topicsJson != null)  {
-            return listSubscribers(topicsJson);
+    @Get("json")
+    public Representation handleGet() {
+        String topic = getQueryValue("topic");
+        if (topic != null) {
+            return listSubscribers(topic);
         } else {
             return listAllUsers();
         }
     }
 
-    public JacksonRepresentation<Username[]> listSubscribers(String topicJson) {
-        Topic topic = JsonUtil.parseTopic(topicJson);
-        JacksonRepresentation<Username[]> usernames = new JacksonRepresentation<>(backend.listSubscribers(topic));
-        usernames.setMediaType(MediaType.APPLICATION_JSON);
-        return usernames;
+    public Representation listSubscribers(String topic) {
+        Username[] usernames = backend.listSubscribers(new Topic(topic));
+        StringRepresentation usrRep = new StringRepresentation(JsonUtil.toJson(usernames));
+        usrRep.setMediaType(MediaType.APPLICATION_JSON);
+        return usrRep;
     }
 
-    public JacksonRepresentation<Username[]> listAllUsers() {
-        JacksonRepresentation<Username[]> usernames = new JacksonRepresentation<>(backend.listUsers());
-        usernames.setMediaType(MediaType.APPLICATION_JSON);
-        return usernames;
+    public Representation listAllUsers() {
+        Username[] usernames = backend.listUsers();
+        StringRepresentation usrRep = new StringRepresentation(JsonUtil.toJson(usernames));
+        usrRep.setMediaType(MediaType.APPLICATION_JSON);
+        return usrRep;
     }
 
 

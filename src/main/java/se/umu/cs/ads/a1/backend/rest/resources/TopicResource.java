@@ -2,7 +2,8 @@ package se.umu.cs.ads.a1.backend.rest.resources;
 
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
-import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
@@ -22,27 +23,28 @@ public class TopicResource extends ServerResource {
     }
 
     @Get
-    public JacksonRepresentation<Topic[]> handleGet() {
-        String usernameJson = getQueryValue("username");
-        if(usernameJson != null) {
-            return getTopicsByUsername(usernameJson);
+    public Representation handleGet() {
+        String username = getQueryValue("username");
+        if(username != null) {
+            return getTopicsByUsername(username);
         } else {
             return getAllTopics();
         }
     }
 
-    public JacksonRepresentation<Topic[]> getTopicsByUsername(String usernameJson) {
-        Username username = new Username(JsonUtil.getValueFromJson(usernameJson));
-        JacksonRepresentation<Topic[]> topics = new JacksonRepresentation<>(backend.listTopics(username));
-        topics.setMediaType(MediaType.APPLICATION_JSON);
+    public Representation getTopicsByUsername(String username) {
+        Topic[] topics = backend.listTopics(new Username(username));
+        StringRepresentation topicRep = new StringRepresentation(JsonUtil.toJson(topics));
+        topicRep.setMediaType(MediaType.APPLICATION_JSON);
         setStatus(Status.SUCCESS_OK);
-        return topics;
+        return topicRep;
     }
 
-    public JacksonRepresentation<Topic[]> getAllTopics() {
-        JacksonRepresentation<Topic[]> topics = new JacksonRepresentation<>(backend.listTopics());
-        topics.setMediaType(MediaType.APPLICATION_JSON);
+    public Representation getAllTopics() {
+        Topic[] topics = backend.listTopics();
+        StringRepresentation topicRep = new StringRepresentation(JsonUtil.toJson(topics));
+        topicRep.setMediaType(MediaType.APPLICATION_JSON);
         setStatus(Status.SUCCESS_OK);
-        return topics;
+        return topicRep;
     }
 }

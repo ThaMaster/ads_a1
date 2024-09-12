@@ -2,7 +2,8 @@ package se.umu.cs.ads.a1.backend.rest.resources;
 
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
-import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
@@ -22,36 +23,30 @@ public class SubscriptionResource extends ServerResource {
     }
 
     @Put
-    public JacksonRepresentation<Topic[]> handlePut() {
-        String usernameJson = getQueryValue("username");
-        String topicJson = getQueryValue("topic");
+    public Representation handlePut() {
+        String username = getQueryValue("username");
+        String topic = getQueryValue("topic");
         String subscribe = getQueryValue("subscribe");
 
-        if (usernameJson == null || topicJson == null || subscribe == null) {
+        if (username == null || topic == null || subscribe == null) {
             setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
             return null;
         }
 
         if (subscribe.equals("true")) {
-            return subscribe(usernameJson, topicJson);
+            return subscribe(username, topic);
         } else {
-            return unsubscribe(usernameJson, topicJson);
+            return unsubscribe(username, topic);
         }
     }
 
-    private JacksonRepresentation<Topic[]> subscribe(String usernameJson, String topicJson) {
-        Username username = new Username(JsonUtil.getValueFromJson(usernameJson));
-        Topic topic = JsonUtil.parseTopic(topicJson);
-        JacksonRepresentation<Topic[]> recTopics = new JacksonRepresentation<>(backend.subscribe(username, topic));
-        recTopics.setMediaType(MediaType.APPLICATION_JSON);
-        return recTopics;
+    private Representation subscribe(String username, String topic) {
+        Topic[] recTopics = backend.subscribe(new Username(username), new Topic(topic));
+        return new StringRepresentation(JsonUtil.toJson(recTopics));
     }
 
-    private JacksonRepresentation<Topic[]> unsubscribe(String usernameJson, String topicJson) {
-        Username username = new Username(JsonUtil.getValueFromJson(usernameJson));
-        Topic topic = JsonUtil.parseTopic(topicJson);
-        JacksonRepresentation<Topic[]> recTopics = new JacksonRepresentation<>(backend.unsubscribe(username, topic));
-        recTopics.setMediaType(MediaType.APPLICATION_JSON);
-        return recTopics;
+    private Representation unsubscribe(String username, String topic) {
+        Topic[] recTopics = backend.unsubscribe(new Username(username), new Topic(topic));
+        return new StringRepresentation(JsonUtil.toJson(recTopics));
     }
 }

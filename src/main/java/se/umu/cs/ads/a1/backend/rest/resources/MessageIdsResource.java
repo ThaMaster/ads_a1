@@ -1,8 +1,8 @@
 package se.umu.cs.ads.a1.backend.rest.resources;
 
-import org.restlet.data.MediaType;
 import org.restlet.data.Status;
-import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
@@ -22,8 +22,8 @@ public class MessageIdsResource extends ServerResource {
         backend = RestBackend.getBackend();
     }
 
-    @Get
-    public JacksonRepresentation<MessageId[]> handleGet() {
+    @Get("json")
+    public Representation handleGet() {
         String username = getQueryValue("username");
         String topic = getQueryValue("topic");
 
@@ -37,23 +37,15 @@ public class MessageIdsResource extends ServerResource {
         }
     }
 
-    private JacksonRepresentation<MessageId[]> getMessagesByUsername(String usernameJson) {
-        Username username = new Username(JsonUtil.getValueFromJson(usernameJson));
-        MessageId[] messages = backend.listMessages(username);
-
-        JacksonRepresentation<MessageId[]> msgRep = new JacksonRepresentation<>(messages);
-        msgRep.setMediaType(MediaType.APPLICATION_JSON);
+    private Representation getMessagesByUsername(String username) {
+        MessageId[] messages = backend.listMessages(new Username(username));
         setStatus(Status.SUCCESS_OK);
-        return msgRep;
+        return new StringRepresentation(JsonUtil.toJson(messages));
     }
 
-    private JacksonRepresentation<MessageId[]> getMessagesByTopic(String topicJson) {
-        Topic topic = new Topic(JsonUtil.getValueFromJson(topicJson));
-        MessageId[] messages = backend.listMessages(topic);
-
-        JacksonRepresentation<MessageId[]> msgRep = new JacksonRepresentation<>(messages);
-        msgRep.setMediaType(MediaType.APPLICATION_JSON);
+    private Representation getMessagesByTopic(String topic) {
+        MessageId[] messages = backend.listMessages(new Topic(topic));
         setStatus(Status.SUCCESS_OK);
-        return msgRep;
+        return new StringRepresentation(JsonUtil.toJson(messages));
     }
 }
