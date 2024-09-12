@@ -1,6 +1,11 @@
 package se.umu.cs.ads.a1.backend;
 
+import org.restlet.Client;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.MediaType;
+import org.restlet.data.Method;
+import org.restlet.data.Protocol;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
@@ -26,10 +31,12 @@ public class RestMessenger implements Messenger {
     private final ClientResource messageIdsUsernameResource;
     private final ClientResource messageIdsTopicResource;
 
+    private final Client client;
+
     public RestMessenger() {
 
         new RestletServer();
-
+        this.client = new Client(Protocol.HTTP);
         messageResource = new ClientResource("http://localhost:8080/messenger/message");
         messagesResource = new ClientResource("http://localhost:8080/messenger/messages");
         subscriptionResource = new ClientResource("http://localhost:8080/messenger/subscription");
@@ -68,11 +75,10 @@ public class RestMessenger implements Messenger {
     @Override
     public Message retrieve(MessageId message) {
         messageResource.getReference().setQuery(null);
-        messageResource.addQueryParameter("messageId", message.getValue());
+        messageResource.setQueryValue("messageId", message.getValue());
 
         Representation msgRep = messageResource.get();
         try {
-
             String jsonText = msgRep.getText();
             if (jsonText == null) {
                 return null;

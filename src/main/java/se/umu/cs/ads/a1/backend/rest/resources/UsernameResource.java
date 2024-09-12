@@ -4,22 +4,13 @@ import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
-import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import se.umu.cs.ads.a1.backend.InMemoryMessengerBackEnd;
 import se.umu.cs.ads.a1.backend.rest.JsonUtil;
-import se.umu.cs.ads.a1.backend.rest.RestBackend;
 import se.umu.cs.ads.a1.types.Topic;
 import se.umu.cs.ads.a1.types.Username;
 
 public class UsernameResource extends ServerResource {
-    private InMemoryMessengerBackEnd backend;
-
-    @Override
-    protected void doInit() throws ResourceException {
-        super.doInit();
-        backend = RestBackend.getBackend();
-    }
 
     @Get("json")
     public Representation handleGet() {
@@ -32,6 +23,7 @@ public class UsernameResource extends ServerResource {
     }
 
     public Representation listSubscribers(String topic) {
+        InMemoryMessengerBackEnd backend = (InMemoryMessengerBackEnd) getContext().getAttributes().get("backend");
         Username[] usernames = backend.listSubscribers(new Topic(topic));
         StringRepresentation usrRep = new StringRepresentation(JsonUtil.toJson(usernames));
         usrRep.setMediaType(MediaType.APPLICATION_JSON);
@@ -39,6 +31,7 @@ public class UsernameResource extends ServerResource {
     }
 
     public Representation listAllUsers() {
+        InMemoryMessengerBackEnd backend = (InMemoryMessengerBackEnd) getContext().getAttributes().get("backend");
         Username[] usernames = backend.listUsers();
         StringRepresentation usrRep = new StringRepresentation(JsonUtil.toJson(usernames));
         usrRep.setMediaType(MediaType.APPLICATION_JSON);

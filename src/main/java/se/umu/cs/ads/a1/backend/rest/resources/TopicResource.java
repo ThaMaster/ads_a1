@@ -5,22 +5,13 @@ import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
-import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import se.umu.cs.ads.a1.backend.InMemoryMessengerBackEnd;
 import se.umu.cs.ads.a1.backend.rest.JsonUtil;
-import se.umu.cs.ads.a1.backend.rest.RestBackend;
 import se.umu.cs.ads.a1.types.Topic;
 import se.umu.cs.ads.a1.types.Username;
 
 public class TopicResource extends ServerResource {
-    private InMemoryMessengerBackEnd backend;
-
-    @Override
-    protected void doInit() throws ResourceException {
-        super.doInit();
-        backend = RestBackend.getBackend();
-    }
 
     @Get
     public Representation handleGet() {
@@ -33,6 +24,7 @@ public class TopicResource extends ServerResource {
     }
 
     public Representation getTopicsByUsername(String username) {
+        InMemoryMessengerBackEnd backend = (InMemoryMessengerBackEnd) getContext().getAttributes().get("backend");
         Topic[] topics = backend.listTopics(new Username(username));
         StringRepresentation topicRep = new StringRepresentation(JsonUtil.toJson(topics));
         topicRep.setMediaType(MediaType.APPLICATION_JSON);
@@ -41,6 +33,7 @@ public class TopicResource extends ServerResource {
     }
 
     public Representation getAllTopics() {
+        InMemoryMessengerBackEnd backend = (InMemoryMessengerBackEnd) getContext().getAttributes().get("backend");
         Topic[] topics = backend.listTopics();
         StringRepresentation topicRep = new StringRepresentation(JsonUtil.toJson(topics));
         topicRep.setMediaType(MediaType.APPLICATION_JSON);

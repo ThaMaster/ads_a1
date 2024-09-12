@@ -13,8 +13,6 @@ import se.umu.cs.ads.a1.types.MessageId;
 import se.umu.cs.ads.a1.types.Topic;
 import se.umu.cs.ads.a1.types.Username;
 
-import java.io.IOException;
-
 public class GrpcServer {
 
     private InMemoryMessengerBackEnd backend;
