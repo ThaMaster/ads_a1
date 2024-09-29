@@ -3,6 +3,7 @@ package se.umu.cs.ads.a1.backend.rest.resources;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
@@ -16,18 +17,12 @@ import java.io.IOException;
 
 public class MessageResource extends ServerResource {
 
-    @Post("json")
+    @Post
     public void storeMessage(Representation msgEntity) {
         InMemoryMessengerBackEnd backend = (InMemoryMessengerBackEnd) getContext().getAttributes().get("backend");
         try {
-            if (msgEntity.getMediaType().equals(MediaType.APPLICATION_JSON)) {
-
-                backend.store(JsonUtil.parseMessage(msgEntity.getText()));
-
-                setStatus(Status.SUCCESS_ACCEPTED);
-            } else {
-                setStatus(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE);
-            }
+            backend.store(JsonUtil.parseMessage(msgEntity.getText()));
+            setStatus(Status.SUCCESS_ACCEPTED);
         } catch (IOException e) {
             e.printStackTrace();
             setStatus(Status.CLIENT_ERROR_BAD_REQUEST);

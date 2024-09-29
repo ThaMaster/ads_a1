@@ -21,7 +21,6 @@ public class RestletServer {
 
         // Disable server logging
         component.setLogService(new LogService(false));
-
         // Start the server
         start();
 

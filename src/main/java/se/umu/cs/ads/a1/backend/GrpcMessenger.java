@@ -14,9 +14,6 @@ import se.umu.cs.ads.a1.types.MessageId;
 import se.umu.cs.ads.a1.types.Topic;
 import se.umu.cs.ads.a1.types.Username;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-
 /**
  * The gRPC version of the Messenger interface. It handles
  * all the communication with Remote Procedure Calls, more
@@ -38,7 +35,7 @@ public class GrpcMessenger implements Messenger {
         // Initialize the channel and stub
         channel = ManagedChannelBuilder.forAddress("127.0.0.1", 8080)
                 .usePlaintext()
-                .maxInboundMessageSize(25 * 1024 * 1024) // 10 MB
+                .maxInboundMessageSize(115 * 1024 * 1024) // 115 MB
                 .build();
         stub = MessengerServiceGrpc.newBlockingStub(channel);
     }
@@ -137,7 +134,7 @@ public class GrpcMessenger implements Messenger {
 
     @Override
     public MessageId[] listMessages(Topic topic) {
-            proto.MessageIds response = stub.listTopicMessages(GrpcUtil.javaToProto(topic));
-            return GrpcUtil.protoToJava(response);
+        proto.MessageIds response = stub.listTopicMessages(GrpcUtil.javaToProto(topic));
+        return GrpcUtil.protoToJava(response);
     }
 }

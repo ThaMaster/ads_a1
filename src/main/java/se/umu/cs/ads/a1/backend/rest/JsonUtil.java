@@ -9,6 +9,8 @@ public class JsonUtil {
 
     private static ObjectMapper mapper = new ObjectMapper();
 
+    private static long t1;
+    private static long t2;
     public static Message parseMessage(String jsonString) {
         try {
             JsonNode rootNode = mapper.readTree(jsonString);
@@ -174,5 +176,20 @@ public class JsonUtil {
         } catch (JsonProcessingException e) {
             return null;
         }
+    }
+
+    public static void startTimer() {
+        t1 = System.currentTimeMillis();
+    }
+
+    public static void stopTimer() {
+        t2 = System.currentTimeMillis();
+    }
+
+    public static long getTimeElapse() {
+        long result = (t2-t1);
+        t1 = 0;
+        t2 = 0;
+        return result;
     }
 }

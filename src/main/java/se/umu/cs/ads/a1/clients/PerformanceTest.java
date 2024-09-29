@@ -4,8 +4,11 @@ import se.umu.cs.ads.a1.interfaces.Messenger;
 import se.umu.cs.ads.a1.types.*;
 import se.umu.cs.ads.a1.util.Util;
 
+import java.util.Arrays;
+
 public class PerformanceTest {
     private final Messenger messenger;
+    private final int RUNS = 15;
 
     //----------------------------------------------------------
     public PerformanceTest(Messenger messenger) {
@@ -13,39 +16,87 @@ public class PerformanceTest {
     }
 
     //----------------------------------------------------------
-    public String testMessageRetrieval(Username username, int nrMessages, int payloadSize) {
-        String testResults = "Message Retrieval Test (" + nrMessages + " messages):\n";
-        Topic topic = new Topic("/test/performance");
+    public void testMessageRetrieval(Username username, int nrMessages, int payloadSize) {
+        System.out.println("m=" + nrMessages + ", s=" + payloadSize);
+        Topic topic = new Topic("/test/performance/retrieval");
         messenger.delete(messenger.listMessages(topic));
-        Content content = Content.EMPTY;
         Data data = Util.constructRandomData(payloadSize);
-        Message[] messages = Message.construct(username, topic, content, data, nrMessages);
+
+        Message[] messages = new Message[nrMessages];
+        for(int i = 0; i < nrMessages; i++) {
+            messages[i] = Util.constructFixedSizeMessage(username, topic, payloadSize);
+        }
         messenger.store(messages);
 
         MessageId[] messageIds = messenger.listMessages(topic);
         if (messageIds.length != nrMessages)
             throw new IllegalStateException("testMessageRetrieval(): setup failure");
 
-        long t1 = System.currentTimeMillis();
-        for (MessageId message : messageIds)
-            messenger.retrieve(message);
+        long[] seqResults = new long[RUNS];
+        long t1;
+        long t2;
+        for (int i = 0; i < RUNS; i++) {
+            t1 = System.currentTimeMillis();
+            for (Message message : messages)
+                messenger.store(message);
+            t2 = System.currentTimeMillis();
+            seqResults[i] = (t2 - t1);
+        }
 
-        long t2 = System.currentTimeMillis();
+        messenger.delete(messenger.listMessages(topic));
 
-        testResults += "\t" + (t2 - t1) + " ms (sequential)\n";
+        long[] batchResults = new long[RUNS];
+        for (int i = 0; i < RUNS; i++) {
+            t1 = System.currentTimeMillis();
+            messenger.store(messages);
+            t2 = System.currentTimeMillis();
+            batchResults[i] += (t2 - t1);
+        }
 
-        long t3 = System.currentTimeMillis();
-        messenger.retrieve(messageIds);
-        long t4 = System.currentTimeMillis();
-
-        testResults += "\t" + (t4 - t3) + " ms (batch)\n";
+        System.out.println("\tSequential times (ms): " + Arrays.toString(seqResults));
+        System.out.println("\tBatch times (ms): " + Arrays.toString(batchResults));
 
         messenger.delete(messenger.listMessages(topic));
         if (messenger.listMessages(topic).length != 0)
             throw new IllegalStateException("testMessageRetrieval(): cleanup failure");
-
-        return testResults;
     }
 
+    public void testMessageThroughput(Username username, long durationSeconds, int payloadSize) {
+        System.out.println("t=" + durationSeconds + "(s), s=" + payloadSize);
+        Topic topic = new Topic("/test/performance/throughput");
+        messenger.delete(messenger.listMessages(topic));
+        Message message = Util.constructFixedSizeMessage(username, topic, payloadSize);
+        messenger.store(message);
+        MessageId id = message.getId();
 
+        long endTime;
+        int[] requestResults = new int[RUNS];
+        int requestCount;
+        for (int i = 0; i < RUNS; i++) {
+            endTime = System.currentTimeMillis() + (durationSeconds * 1000);
+            requestCount = 0;
+            while (true) {
+                long requestStartTime = System.currentTimeMillis();
+                long remainingTime = endTime - requestStartTime;
+
+                messenger.retrieve(id);
+
+                long requestEndTime = System.currentTimeMillis();
+                long requestDuration = requestEndTime - requestStartTime;
+
+                if (requestDuration > remainingTime) {
+                    break;
+                }
+                requestCount++;
+            }
+            messenger.delete(messenger.listMessages(topic));
+            requestResults[i] = requestCount;
+        }
+
+        System.out.println("\tNumber of requests: " + Arrays.toString(requestResults));
+
+        messenger.delete(messenger.listMessages(topic));
+        if (messenger.listMessages(topic).length != 0)
+            throw new IllegalStateException("testMessageRetrieval(): cleanup failure");
+    }
 }

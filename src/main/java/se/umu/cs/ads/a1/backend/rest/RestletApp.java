@@ -13,7 +13,6 @@ public class RestletApp extends Application {
     public Restlet createInboundRoot() {
         Context context = getContext();
         context.getAttributes().put("backend", new InMemoryMessengerBackEnd());
-
         Router router = new Router(context);
 
         router.attach("/message", MessageResource.class);
@@ -27,7 +26,6 @@ public class RestletApp extends Application {
         router.attach("/usernames", UsernameResource.class);
 
         router.attach("/subscription", SubscriptionResource.class);
-
         return router;
     }
 }

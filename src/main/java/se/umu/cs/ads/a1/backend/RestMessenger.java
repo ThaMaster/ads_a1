@@ -12,10 +12,8 @@ import org.restlet.resource.ClientResource;
 import se.umu.cs.ads.a1.backend.rest.JsonUtil;
 import se.umu.cs.ads.a1.backend.rest.RestletServer;
 import se.umu.cs.ads.a1.interfaces.Messenger;
-import se.umu.cs.ads.a1.types.Message;
-import se.umu.cs.ads.a1.types.MessageId;
-import se.umu.cs.ads.a1.types.Topic;
-import se.umu.cs.ads.a1.types.Username;
+import se.umu.cs.ads.a1.types.*;
+import se.umu.cs.ads.a1.util.Util;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -77,13 +75,12 @@ public class RestMessenger implements Messenger {
         messageResource.getReference().setQuery(null);
         messageResource.setQueryValue("messageId", message.getValue());
 
-        Representation msgRep = messageResource.get();
         try {
+            Representation msgRep = messageResource.get();
             String jsonText = msgRep.getText();
             if (jsonText == null) {
                 return null;
             }
-
             return JsonUtil.parseMessage(jsonText);
         } catch (IOException e) {
             e.printStackTrace();
@@ -168,6 +165,7 @@ public class RestMessenger implements Messenger {
         usernamesResource.getReference().setQuery(null);
         try {
             Representation msgRep = usernamesResource.get();
+
             return JsonUtil.parseUsernames(msgRep.getText());
 
         } catch (IOException e) {

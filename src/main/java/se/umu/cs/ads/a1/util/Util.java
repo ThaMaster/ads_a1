@@ -103,6 +103,12 @@ public class Util
     return wildcard ? topic.substring(0,topic.length() - LENGTH_WILDCARD) : topic;
   }
 
+  //----------------------------------------------------------
+  public static String toWildcardString (String topic, boolean wildcard)
+  {
+    return wildcard ? topic + Util.WILDCARD : topic;
+  }
+
 
   //----------------------------------------------------------
   //----------------------------------------------------------
@@ -172,6 +178,12 @@ public class Util
   public static Message constructRandomMessage (Username username, Topic topic, int size)
   {
     return Message.construct(username,topic,constructRandomContent(),constructRandomData(size));
+  }
+
+  //----------------------------------------------------------
+  public static Message constructFixedSizeMessage (Username username, Topic topic, int size)
+  {
+    return Message.construct(username,topic,Content.EMPTY,constructRandomData(size));
   }
 
 
