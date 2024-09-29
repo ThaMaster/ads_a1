@@ -10,6 +10,9 @@ public class PerformanceTest {
     private final Messenger messenger;
     private final int RUNS = 15;
 
+    private String seqTestResults = "";
+    private String batTestResults = "";
+
     //----------------------------------------------------------
     public PerformanceTest(Messenger messenger) {
         this.messenger = messenger;
@@ -19,13 +22,14 @@ public class PerformanceTest {
     public void testMessageRetrieval(Username username, int nrMessages, int payloadSize) {
         System.out.println("m=" + nrMessages + ", s=" + payloadSize);
         Topic topic = new Topic("/test/performance/retrieval");
+
         messenger.delete(messenger.listMessages(topic));
-        Data data = Util.constructRandomData(payloadSize);
 
         Message[] messages = new Message[nrMessages];
         for(int i = 0; i < nrMessages; i++) {
             messages[i] = Util.constructFixedSizeMessage(username, topic, payloadSize);
         }
+
         messenger.store(messages);
 
         MessageId[] messageIds = messenger.listMessages(topic);
@@ -37,25 +41,38 @@ public class PerformanceTest {
         long t2;
         for (int i = 0; i < RUNS; i++) {
             t1 = System.currentTimeMillis();
-            for (Message message : messages)
-                messenger.store(message);
+            for (MessageId id : messageIds) {
+                messenger.retrieve(id);
+            }
             t2 = System.currentTimeMillis();
             seqResults[i] = (t2 - t1);
         }
 
-        messenger.delete(messenger.listMessages(topic));
+        for (int i = 0; i < seqResults.length; i++) {
+            seqTestResults += String.valueOf(seqResults[i]);
+            if(i != seqResults.length-1) {
+                seqTestResults += ", ";
+            } else {
+                seqTestResults += "\n";
+            }
+        }
 
         long[] batchResults = new long[RUNS];
         for (int i = 0; i < RUNS; i++) {
             t1 = System.currentTimeMillis();
-            messenger.store(messages);
+            messenger.retrieve(messageIds);
             t2 = System.currentTimeMillis();
             batchResults[i] += (t2 - t1);
         }
 
-        System.out.println("\tSequential times (ms): " + Arrays.toString(seqResults));
-        System.out.println("\tBatch times (ms): " + Arrays.toString(batchResults));
-
+        for (int i = 0; i < batchResults.length; i++) {
+            batTestResults += String.valueOf(batchResults[i]);
+            if(i != batchResults.length-1) {
+                batTestResults += ", ";
+            } else {
+                batTestResults += "\n";
+            }
+        }
         messenger.delete(messenger.listMessages(topic));
         if (messenger.listMessages(topic).length != 0)
             throw new IllegalStateException("testMessageRetrieval(): cleanup failure");
@@ -98,5 +115,14 @@ public class PerformanceTest {
         messenger.delete(messenger.listMessages(topic));
         if (messenger.listMessages(topic).length != 0)
             throw new IllegalStateException("testMessageRetrieval(): cleanup failure");
+    }
+
+    public void printResults() {
+        System.out.println("\tSequential times (ms)");
+        System.out.println(seqTestResults);
+        System.out.println("\tBatch times (ms)");
+        System.out.println(batTestResults);
+        seqTestResults = "";
+        batTestResults = "";
     }
 }

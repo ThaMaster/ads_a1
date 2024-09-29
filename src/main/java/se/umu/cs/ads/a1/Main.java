@@ -59,6 +59,7 @@ public class Main {
                 test.testMessageThroughput(username, 2, 512);
                 test.testMessageThroughput(username, 4, 512);
                 test.testMessageThroughput(username, 8, 512);
+                test.printResults();
                 System.out.println("Done");
 
                 test = new PerformanceTest(messenger);
@@ -71,6 +72,7 @@ public class Main {
                 test.testMessageRetrieval(username, 200, 4096);
                 test.testMessageRetrieval(username, 200, 8192);
                 test.testMessageRetrieval(username, 200, 16384);
+                test.printResults();
                 System.out.println("Done\n");
 
                 test = new PerformanceTest(messenger);
@@ -83,6 +85,7 @@ public class Main {
                 test.testMessageRetrieval(username, 3200, 512);
                 test.testMessageRetrieval(username, 6400, 512);
                 test.testMessageRetrieval(username, 12800, 512);
+                test.printResults();
                 System.out.println("Done\n");
             }
 
@@ -94,6 +97,7 @@ public class Main {
                 test.testMessageThroughput(username, 2, 512);
                 test.testMessageThroughput(username, 4, 512);
                 test.testMessageThroughput(username, 8, 512);
+                test.printResults();
                 System.out.println("Done");
             }
 
@@ -109,6 +113,7 @@ public class Main {
                 test.testMessageRetrieval(username, 200, 4096);
                 test.testMessageRetrieval(username, 200, 8192);
                 test.testMessageRetrieval(username, 200, 16384);
+                test.printResults();
                 System.out.println("Done\n");
             }
 
@@ -124,6 +129,7 @@ public class Main {
                 test.testMessageRetrieval(username, 3200, 512);
                 test.testMessageRetrieval(username, 6400, 512);
                 test.testMessageRetrieval(username, 12800, 512);
+                test.printResults();
                 System.out.println("Done\n");
             }
 
