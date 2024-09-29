@@ -46,7 +46,11 @@ public class GrpcMessenger implements Messenger {
      */
     private void startServerOnThread() {
         try {
-            new Thread(() -> new GrpcServer().start()).start();
+            GrpcServer grpcServer = new GrpcServer();
+            new Thread(grpcServer::start).start();
+
+            // Wait for the server to signal it has started
+            grpcServer.getServerStartedLatch().await();
         } catch (Exception e) {
             System.out.println("BRUH");
         }

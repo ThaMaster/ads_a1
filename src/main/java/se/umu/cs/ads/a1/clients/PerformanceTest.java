@@ -4,8 +4,6 @@ import se.umu.cs.ads.a1.interfaces.Messenger;
 import se.umu.cs.ads.a1.types.*;
 import se.umu.cs.ads.a1.util.Util;
 
-import java.util.Arrays;
-
 public class PerformanceTest {
     private final Messenger messenger;
     private final int RUNS = 15;
@@ -13,108 +11,120 @@ public class PerformanceTest {
     private String seqTestResults = "";
     private String batTestResults = "";
 
+    private Topic topic;
+    private MessageId[] messageIds;
+
+    private final int[] nrMessages = {1000, 2000, 4000, 8000, 16000, 3200, 6400, 12800};
+    private final int[] payloadSize = {128, 256, 512, 1024, 2048, 4096, 8192, 16384};
+
+    private final int FIXED_NR_MESSAGES = 200;
+    private final int FIXED_PAYLOAD_SIZE = 512;
+
+
     //----------------------------------------------------------
     public PerformanceTest(Messenger messenger) {
         this.messenger = messenger;
     }
 
-    //----------------------------------------------------------
-    public void testMessageRetrieval(Username username, int nrMessages, int payloadSize) {
-        System.out.println("m=" + nrMessages + ", s=" + payloadSize);
-        Topic topic = new Topic("/test/performance/retrieval");
-
-        messenger.delete(messenger.listMessages(topic));
-
-        Message[] messages = new Message[nrMessages];
-        for(int i = 0; i < nrMessages; i++) {
-            messages[i] = Util.constructFixedSizeMessage(username, topic, payloadSize);
+    public void testRetrievalFixedMessages() {
+        for (int size : payloadSize) {
+            long[] batchTimes = new long[RUNS];
+            long[] sequentialTimes = new long[RUNS];
+            System.out.println("m=" + FIXED_NR_MESSAGES + " s=" + size);
+            for (int i = 0; i < RUNS; i++) {
+                setup(FIXED_NR_MESSAGES, size);
+                sequentialTimes[i] = testMessageRetrievalSequential();
+                batchTimes[i] = testMessageRetrievalBatch();
+                tearDown();
+            }
+            addResults(sequentialTimes, batchTimes);
         }
+    }
 
+    //----------------------------------------------------------
+    public void testRetrievalFixedPayload() {
+        warmup(10000, 4096);
+        for (int messages : nrMessages) {
+            long[] batchTimes = new long[RUNS];
+            long[] sequentialTimes = new long[RUNS];
+            System.out.println("m=" + messages + " s=" + FIXED_PAYLOAD_SIZE);
+            for (int i = 0; i < RUNS; i++) {
+                setup(messages, FIXED_PAYLOAD_SIZE);
+                sequentialTimes[i] = testMessageRetrievalSequential();
+                batchTimes[i] = testMessageRetrievalBatch();
+                tearDown();
+            }
+            addResults(sequentialTimes, batchTimes);
+        }
+    }
+
+    public void setup(int nrMessages, int payloadSize) {
+        // Prepares the messages
+        Username username = new Username("testusername");
+        this.topic = new Topic("/test/performance/retrieval");
+
+        Content content = Content.EMPTY;
+        Data data = Util.constructRandomData(payloadSize);
+        Message[] messages = Message.construct(username, topic, content, data, nrMessages);
         messenger.store(messages);
 
-        MessageId[] messageIds = messenger.listMessages(topic);
-        if (messageIds.length != nrMessages)
+        messageIds = messenger.listMessages(topic);
+        if (messageIds.length != nrMessages) {
             throw new IllegalStateException("testMessageRetrieval(): setup failure");
-
-        long[] seqResults = new long[RUNS];
-        long t1;
-        long t2;
-        for (int i = 0; i < RUNS; i++) {
-            t1 = System.currentTimeMillis();
-            for (MessageId id : messageIds) {
-                messenger.retrieve(id);
-            }
-            t2 = System.currentTimeMillis();
-            seqResults[i] = (t2 - t1);
         }
+    }
 
-        for (int i = 0; i < seqResults.length; i++) {
-            seqTestResults += String.valueOf(seqResults[i]);
-            if(i != seqResults.length-1) {
-                seqTestResults += ", ";
-            } else {
-                seqTestResults += "\n";
-            }
+    public void tearDown() {
+        messenger.delete(messenger.listMessages(topic));
+        if (messenger.listMessages(topic).length != 0) {
+            throw new IllegalStateException("testMessageRetrieval(): cleanup failure");
         }
+    }
 
-        long[] batchResults = new long[RUNS];
-        for (int i = 0; i < RUNS; i++) {
-            t1 = System.currentTimeMillis();
-            messenger.retrieve(messageIds);
-            t2 = System.currentTimeMillis();
-            batchResults[i] += (t2 - t1);
+    public long testMessageRetrievalSequential() {
+        long start = System.currentTimeMillis();
+        for (MessageId messageId : messageIds) {
+            messenger.retrieve(messageId);
         }
+        long end = System.currentTimeMillis();
 
-        for (int i = 0; i < batchResults.length; i++) {
-            batTestResults += String.valueOf(batchResults[i]);
-            if(i != batchResults.length-1) {
+        return (end - start);
+    }
+
+    public long testMessageRetrievalBatch() {
+        long start = System.currentTimeMillis();
+        messenger.retrieve(messageIds);
+        long end = System.currentTimeMillis();
+
+        return (end - start);
+    }
+
+    public void warmup(int nrMessages, int payloadSize) {
+        // Warm-up phase
+        setup(nrMessages, payloadSize); // Use fixed warm-up configuration
+        testMessageRetrievalSequential();     // You can use either batch or sequential
+        testMessageRetrievalBatch();     // You can use either batch or sequential
+        tearDown(); // Reset after warm-up
+    }
+
+    public void addResults(long[] sequentialTimes, long[] batchTimes) {
+        for (int i = 0; i < batchTimes.length; i++) {
+            batTestResults += String.valueOf(batchTimes[i]);
+            if (i != batchTimes.length - 1) {
                 batTestResults += ", ";
             } else {
                 batTestResults += "\n";
             }
         }
-        messenger.delete(messenger.listMessages(topic));
-        if (messenger.listMessages(topic).length != 0)
-            throw new IllegalStateException("testMessageRetrieval(): cleanup failure");
-    }
 
-    public void testMessageThroughput(Username username, long durationSeconds, int payloadSize) {
-        System.out.println("t=" + durationSeconds + "(s), s=" + payloadSize);
-        Topic topic = new Topic("/test/performance/throughput");
-        messenger.delete(messenger.listMessages(topic));
-        Message message = Util.constructFixedSizeMessage(username, topic, payloadSize);
-        messenger.store(message);
-        MessageId id = message.getId();
-
-        long endTime;
-        int[] requestResults = new int[RUNS];
-        int requestCount;
-        for (int i = 0; i < RUNS; i++) {
-            endTime = System.currentTimeMillis() + (durationSeconds * 1000);
-            requestCount = 0;
-            while (true) {
-                long requestStartTime = System.currentTimeMillis();
-                long remainingTime = endTime - requestStartTime;
-
-                messenger.retrieve(id);
-
-                long requestEndTime = System.currentTimeMillis();
-                long requestDuration = requestEndTime - requestStartTime;
-
-                if (requestDuration > remainingTime) {
-                    break;
-                }
-                requestCount++;
+        for (int i = 0; i < sequentialTimes.length; i++) {
+            seqTestResults += String.valueOf(sequentialTimes[i]);
+            if (i != sequentialTimes.length - 1) {
+                seqTestResults += ", ";
+            } else {
+                seqTestResults += "\n";
             }
-            messenger.delete(messenger.listMessages(topic));
-            requestResults[i] = requestCount;
         }
-
-        System.out.println("\tNumber of requests: " + Arrays.toString(requestResults));
-
-        messenger.delete(messenger.listMessages(topic));
-        if (messenger.listMessages(topic).length != 0)
-            throw new IllegalStateException("testMessageRetrieval(): cleanup failure");
     }
 
     public void printResults() {

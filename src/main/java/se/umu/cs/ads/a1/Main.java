@@ -49,86 +49,17 @@ public class Main {
                 test.runAllTests();
             }
 
-            Username username = new Username("testusername");
-
             // Full performance run
-            if (Util.containsFlag(args, "-perfAll")) {
-                System.out.println("Testing throughput...");
+            if (Util.containsFlag(args, "-perfFixedMessages")) {
                 PerformanceTest test = new PerformanceTest(messenger);
-                test.testMessageThroughput(username, 1, 512);
-                test.testMessageThroughput(username, 2, 512);
-                test.testMessageThroughput(username, 4, 512);
-                test.testMessageThroughput(username, 8, 512);
-                test.printResults();
-                System.out.println("Done");
-
-                test = new PerformanceTest(messenger);
-                System.out.println("Testing retrieval latency (Fixed Messages)...");
-                test.testMessageRetrieval(username, 200, 128);
-                test.testMessageRetrieval(username, 200, 256);
-                test.testMessageRetrieval(username, 200, 512);
-                test.testMessageRetrieval(username, 200, 1024);
-                test.testMessageRetrieval(username, 200, 2048);
-                test.testMessageRetrieval(username, 200, 4096);
-                test.testMessageRetrieval(username, 200, 8192);
-                test.testMessageRetrieval(username, 200, 16384);
-                test.printResults();
-                System.out.println("Done\n");
-
-                test = new PerformanceTest(messenger);
-                System.out.println("Testing retrieval latency (Fixed Payload)...");
-                test.testMessageRetrieval(username, 100, 512);
-                test.testMessageRetrieval(username, 200, 512);
-                test.testMessageRetrieval(username, 400, 512);
-                test.testMessageRetrieval(username, 800, 512);
-                test.testMessageRetrieval(username, 1600, 512);
-                test.testMessageRetrieval(username, 3200, 512);
-                test.testMessageRetrieval(username, 6400, 512);
-                test.testMessageRetrieval(username, 12800, 512);
+                test.testRetrievalFixedMessages();
                 test.printResults();
                 System.out.println("Done\n");
             }
 
-            // Test the throughput with heavy payload
-            if (Util.containsFlag(args, "-throughput")) {
-                System.out.println("Testing throughput...");
+            if (Util.containsFlag(args, "-perfFixedPayload")) {
                 PerformanceTest test = new PerformanceTest(messenger);
-                test.testMessageThroughput(username, 1, 512);
-                test.testMessageThroughput(username, 2, 512);
-                test.testMessageThroughput(username, 4, 512);
-                test.testMessageThroughput(username, 8, 512);
-                test.printResults();
-                System.out.println("Done");
-            }
-
-            // Test the latency of retrieval with light payload
-            if (Util.containsFlag(args, "-latencyFixedMessages")) {
-                PerformanceTest test = new PerformanceTest(messenger);
-                System.out.println("Testing retrieval latency (Fixed Messages)...");
-                test.testMessageRetrieval(username, 200, 128);
-                test.testMessageRetrieval(username, 200, 256);
-                test.testMessageRetrieval(username, 200, 512);
-                test.testMessageRetrieval(username, 200, 1024);
-                test.testMessageRetrieval(username, 200, 2048);
-                test.testMessageRetrieval(username, 200, 4096);
-                test.testMessageRetrieval(username, 200, 8192);
-                test.testMessageRetrieval(username, 200, 16384);
-                test.printResults();
-                System.out.println("Done\n");
-            }
-
-            // Test the latency of retrieval with light payload
-            if (Util.containsFlag(args, "-latencyFixedPayload")) {
-                PerformanceTest test = new PerformanceTest(messenger);
-                System.out.println("Testing retrieval latency (Fixed Payload)...");
-                test.testMessageRetrieval(username, 100, 512);
-                test.testMessageRetrieval(username, 200, 512);
-                test.testMessageRetrieval(username, 400, 512);
-                test.testMessageRetrieval(username, 800, 512);
-                test.testMessageRetrieval(username, 1600, 512);
-                test.testMessageRetrieval(username, 3200, 512);
-                test.testMessageRetrieval(username, 6400, 512);
-                test.testMessageRetrieval(username, 12800, 512);
+                test.testRetrievalFixedPayload();
                 test.printResults();
                 System.out.println("Done\n");
             }

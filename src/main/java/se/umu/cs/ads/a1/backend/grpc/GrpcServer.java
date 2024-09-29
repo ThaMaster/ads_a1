@@ -13,10 +13,13 @@ import se.umu.cs.ads.a1.types.MessageId;
 import se.umu.cs.ads.a1.types.Topic;
 import se.umu.cs.ads.a1.types.Username;
 
+import java.util.concurrent.CountDownLatch;
+
 public class GrpcServer {
 
     private InMemoryMessengerBackEnd backend;
     private Server server;
+    private final CountDownLatch serverStartedLatch = new CountDownLatch(1);
 
     /**
      * Constructor of the GrpcServer, will start a new backend and
@@ -38,9 +41,14 @@ public class GrpcServer {
         Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
         try {
             server.start();
+            serverStartedLatch.countDown();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public CountDownLatch getServerStartedLatch() {
+        return serverStartedLatch;
     }
 
     /**
